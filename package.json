@@ -1,0 +1,27 @@
+{
+  "name": "back-end-ecomapper-capstone-project",
+  "version": "1.0.0",
+  "description": "This is the repository for the backend of the Ecomapper capstone project.",
+  "main": "index.js",
+  "scripts": {
+    "devStart": "nodemon -e js,ejs index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ecomappah/Back-End-Ecomapper-Capstone-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ecomappah/Back-End-Ecomapper-Capstone-Project/issues"
+  },
+  "homepage": "https://github.com/ecomappah/Back-End-Ecomapper-Capstone-Project#readme",
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
