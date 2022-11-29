@@ -1,25 +1,12 @@
 {
-<<<<<<< HEAD
-  "name": "ecomapper-back-end",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "start": "node ./bin/www"
-  },
-  "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
-=======
   "name": "back-end-ecomapper-capstone-project",
   "version": "1.0.0",
   "description": "This is the repository for the backend of the Ecomapper capstone project.",
-  "main": "index.js",
+  "main": "index.js", 
+  "private": true,
   "scripts": {
-    "devStart": "nodemon -e js,ejs index.js"
+    "devStart": "nodemon -e js,ejs index.js",
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -34,10 +21,14 @@
   "homepage": "https://github.com/ecomappah/Back-End-Ecomapper-Capstone-Project#readme",
   "dependencies": {
     "ejs": "^3.1.8",
-    "express": "^4.18.2"
+    "express": "^4.18.2", 
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "pug": "2.0.0-beta11"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
->>>>>>> remotes/origin/iguy/add-to-readme-make-landing-page
   }
 }
