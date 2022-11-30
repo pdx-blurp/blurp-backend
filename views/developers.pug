@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    h1 Developers
+    p
+        b Lists all the developers from the JSON file
+    ul
+    each dev in json
+        li= dev.name
+            i= " (" + dev.team + ")"
+
