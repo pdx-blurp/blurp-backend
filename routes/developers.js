@@ -7,4 +7,9 @@ router.get('/', function(req, res, next) {
   res.render('developers', { json: devsJson });
 });
 
+router.get('/json', function(req, res, next) {
+  const devsJson = require("../public/devs.json");
+  res.send(devsJson);
+});
+
 module.exports = router;
