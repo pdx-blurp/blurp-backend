@@ -2,10 +2,10 @@
   "name": "back-end-ecomapper-capstone-project",
   "version": "1.0.0",
   "description": "This is the repository for the backend of the Ecomapper capstone project.",
-  "main": "index.js", 
+  "main": "app.js",
   "private": true,
   "scripts": {
-    "devStart": "nodemon -e js,ejs index.js",
+    "devStart": "nodemon -e js,ejs app.js",
     "start": "node ./bin/www"
   },
   "repository": {
