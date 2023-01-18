@@ -63,23 +63,18 @@ router.get("/get", function (req, res, next) {
  */
 
 router.patch("/update", function (req, res, next) {
-  const { name } = req.body;
-  const update = req.body.update;
+  const { name, update } = req.body;
   let dev = JSON.parse(fs.readFileSync(__dirname + "/../public/devs.json", 'utf-8'));
-  const found = dev.find((devObj) => devObj.name === name);
-  console.log(found);
-  console.log(name);
-  console.log(req.body);
+  const found = dev.findIndex((devObj) => devObj.name === name);
 
-  if (found) {
-    dev = Object.assign(found, update);
-    console.log(dev);
-//    fs.writeFile(__dirname + "/../public/devs.json", JSON.stringify(dev), function (err) {
-//        if (err) {
-//            res.status(400).send("Issue writing file!");
-//        }
-//    });
-    res.status(200).json(found);
+  if (found !== -1) {
+    Object.assign(dev[found], update);
+    fs.writeFile(__dirname + "/../public/devs.json", JSON.stringify(dev), function (err) {
+        if (err) {
+            res.status(400).send("Issue writing file!");
+        }
+    });
+    res.status(200).json(dev[found]);
   } else {
     res.status(404).json({ mess: "developer not found" });
   }
