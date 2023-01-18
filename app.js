@@ -9,6 +9,8 @@ var developersRouter = require('./routes/developers')
 var userRouter = require("./routes/landing")
 var mapRouter = require('./routes/map')
 
+var mapRouter = require("./routes/map");
+
 var app = express();
 
 // view engine setup
@@ -25,9 +27,9 @@ app.use('/', indexRouter);
 app.use('/developers', developersRouter)
 app.use('/map', mapRouter);
 
-app.use("/landing", userRouter)
-app.get('/pg1ex', userRouter)
-app.get('/pg2ex', userRouter)
+app.use("/landing", userRouter);
+app.get('/pg1ex', userRouter);
+app.get('/pg2ex', userRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

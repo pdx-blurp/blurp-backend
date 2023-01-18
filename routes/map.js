@@ -6,6 +6,10 @@ let router = express.Router();
  * Create endpoint, which takes name and team parameters from the request body.
  * The name and team must be specified to create a new entry.
  */
+router.get('/', (req, res, next) => {
+	res.send(JSON.parse(fs.readFileSync(__dirname + "/../public/devs.json", 'utf-8')));
+});
+
 router.post('/create', function (req, res, next) {
     // Grab the parameters from the request body that we need
     const {name, team} = req.body;
