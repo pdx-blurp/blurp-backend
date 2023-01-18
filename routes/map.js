@@ -3,12 +3,17 @@ const fs = require("fs");
 let router = express.Router();
 
 /**
- * Create endpoint, which takes name and team parameters from the request body.
- * The name and team must be specified to create a new entry.
+ * Root map endpoint, get request, returns all names including the team they belong to
  */
+
 router.get('/', (req, res, next) => {
 	res.send(JSON.parse(fs.readFileSync(__dirname + "/../public/devs.json", 'utf-8')));
 });
+
+/**
+ * Create endpoint, which takes name and team parameters from the request body.
+ * The name and team must be specified to create a new entry.
+ */
 
 router.post('/create', function (req, res, next) {
     // Grab the parameters from the request body that we need
@@ -34,6 +39,50 @@ router.post('/create', function (req, res, next) {
 
     // Send JSON with new changes
     res.send(json);
+});
+
+/**
+ * Get endpoint, which takes the name parameter and returns the entire developer object
+ */
+
+router.get("/get", function (req, res, next) {
+  const { name } = req.body;
+  let dev = JSON.parse(fs.readFileSync(__dirname + "/../public/devs.json", 'utf-8'));
+
+  const found = dev.find((devObj) => devObj.name === name);
+  if (found) {
+    const singleDev = dev.filter((devObj) => devObj.name === name);
+    res.status(200).json(singleDev);
+  } else {
+    res.status(404).json({ message: "Developer not found" });
+  }
+});
+
+/**
+ * Update endpoint, which takes the name parameter and updates the developer in the devs.json
+ */
+
+router.patch("/update", function (req, res, next) {
+  const { name } = req.body;
+  const update = req.body.update;
+  let dev = JSON.parse(fs.readFileSync(__dirname + "/../public/devs.json", 'utf-8'));
+  const found = dev.find((devObj) => devObj.name === name);
+  console.log(found);
+  console.log(name);
+  console.log(req.body);
+
+  if (found) {
+    dev = Object.assign(found, update);
+    console.log(dev);
+//    fs.writeFile(__dirname + "/../public/devs.json", JSON.stringify(dev), function (err) {
+//        if (err) {
+//            res.status(400).send("Issue writing file!");
+//        }
+//    });
+    res.status(200).json(found);
+  } else {
+    res.status(404).json({ mess: "developer not found" });
+  }
 });
 
 
