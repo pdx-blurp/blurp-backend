@@ -7,6 +7,7 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var developersRouter = require('./routes/developers')
 var userRouter = require("./routes/landing")
+var mapRouter = require('./routes/map')
 
 var app = express();
 
@@ -22,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/developers', developersRouter)
+app.use('/map', mapRouter);
 
 app.use("/landing", userRouter)
 app.get('/pg1ex', userRouter)
