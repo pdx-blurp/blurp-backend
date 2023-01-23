@@ -25,7 +25,8 @@
           }
         ],
         "description": "Relationship description",
-        "relationshipType": 1111
+        "relationshipType": 1111,
+        "relationshipID": 1
       },
       {
         "nodePair": [
@@ -35,7 +36,8 @@
           }
         ],
         "description": "Relationship description",
-        "relationshipType": 1111
+        "relationshipType": 1111,
+        "relationshipID": 2
       }
     ]
   }
