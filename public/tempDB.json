@@ -1,0 +1,41 @@
+{
+    "userName": "Test User Zero",
+    "userID": 0,
+    "mapID": 0,
+    "nodes": [
+      {
+        "nodeID": 0,
+        "nodeName": "nodeZero"
+      },
+      {
+        "nodeID": 1,
+        "nodeName": "nodeOne"
+      },
+      {
+        "nodeID": 2,
+        "nodeName": "nodeTwo"
+      }
+    ],
+    "relationships": [
+      {
+        "nodePair": [
+          {
+            "nodeOne": 0,
+            "nodeTwo": 1
+          }
+        ],
+        "description": "Relationship description",
+        "relationshipType": 1111
+      },
+      {
+        "nodePair": [
+          {
+            "nodeOne": 1,
+            "nodeTwo": 2
+          }
+        ],
+        "description": "Relationship description",
+        "relationshipType": 1111
+      }
+    ]
+  }
