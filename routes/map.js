@@ -124,7 +124,12 @@ router.get("/node", (req, res) => {
 
 router.get("/node/get", (req, res) => {
   const { userID } = req.body;
-
+  const nodeArr = [
+    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
+    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
+  ];
   const found = nodeArr.find((node) => node.userID === userID);
   if (found) {
     const singleNode = nodeArr.filter((node) => node.userID === userID);
