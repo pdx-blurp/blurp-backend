@@ -141,6 +141,12 @@ router.get("/node/get", (req, res) => {
 
 router.post("/node/create", (req, res) => {
   const { userID, mapID, name, color } = req.body;
+  const nodeArr = [
+    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
+    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
+  ];
 
   nodeArr.push({ nodeID: 3, userID, mapID, name, color });
   res.send(nodeArr);
@@ -148,6 +154,12 @@ router.post("/node/create", (req, res) => {
 
 router.delete("/node/delete", (req, res) => {
   const { userID, mapID, nodeID } = req.body;
+  const nodeArr = [
+    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
+    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
+  ];
 
   const found = false;
   nodeArr.forEach((element, index) => {
@@ -168,6 +180,12 @@ router.delete("/node/delete", (req, res) => {
 
 router.patch("/node/update", (req, res) => {
   const { userID, mapID, nodeID, name, color } = req.body;
+  const nodeArr = [
+    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
+    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
+    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
+  ];
 
   nodeArr.forEach((element, index) => {
     if (
