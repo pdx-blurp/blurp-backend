@@ -6,10 +6,8 @@ let router = express.Router();
  * Root map endpoint, get request, returns all names including the team they belong to
  */
 
-router.get("/", (req, res, next) => {
-  res.send(
-    JSON.parse(fs.readFileSync(__dirname + "/../public/devs.json", "utf-8"))
-  );
+router.get('/', (req, res, next) => {
+	res.send(JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8')));
 });
 
 /**
@@ -17,54 +15,46 @@ router.get("/", (req, res, next) => {
  * The name and team must be specified to create a new entry.
  */
 
-router.post("/create", function (req, res, next) {
-  // Grab the parameters from the request body that we need
-  const { name, team } = req.body;
+router.post('/create', function (req, res, next) {
+    // Grab the parameters from the request body that we need
+    const { name } = req.body;
 
-  // Ensure name and team are specified
-  if (!name || !team) {
-    res.status(400).send("Must specify name and team!");
-  }
-
-  // This assumes the file already exists (and it should)
-  let json = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/devs.json", "utf-8")
-  );
-
-  // Add name and team to JSON
-  json.push({ name, team });
-
-  // Write new changes to file
-  fs.writeFile(
-    __dirname + "/../public/devs.json",
-    JSON.stringify(json),
-    function (err) {
-      if (err) {
-        res.status(400).send("Issue writing file!");
-      }
+    // Ensure name and team are specified
+    if (!name) {
+        res.status(400).send("Must specify name!");
     }
-  );
+
+    // This assumes the file already exists (and it should)
+    let json = JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8'));
+
+    // Add name and team to JSON
+    json.push({name});
+
+    // Write new changes to file
+    fs.writeFile(__dirname + "/../public/tempDB.json", JSON.stringify(json), function (err) {
+        if (err) {
+            res.status(400).send("Issue writing file!");
+        }
+    });
 
   // Send JSON with new changes
   res.send(json);
 });
 
 /**
- * Get endpoint, which takes the name parameter and returns the entire developer object
+ * Get endpoint, which takes the userID parameter and returns the users map
  */
 
 router.get("/get", function (req, res, next) {
-  const { name } = req.body;
-  let dev = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/devs.json", "utf-8")
-  );
+  const { userID } = req.body;
+  let inDb = JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8'));
+  const found = inDb.find((inDBobj) => inDBobj.userID === userID);
 
-  const found = dev.find((devObj) => devObj.name === name);
   if (found) {
-    const singleDev = dev.filter((devObj) => devObj.name === name);
-    res.status(200).json(singleDev);
+    const user = inDb.filter((inDBobj) => inDBobj.userID === userID);
+    res.status(200).json(user);
   } else {
-    res.status(404).json({ message: "Developer not found" });
+    res.status(404).json({ message: "User not found" });
   }
 });
 
@@ -187,7 +177,6 @@ router.patch("/node/update", (req, res) => {
     res.status(200).json(nodeArr);
   } else {
     res.status(400).json({ message: "Node not found" });
-  }
 });
 
 module.exports = router;
