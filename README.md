@@ -5,7 +5,7 @@ This is the repository for the backend of the Ecomapper capstone project.
 The purpose of this back-end section is to manage data received from users on the front-end of Blurp and to (eventually) communicate with the MongoDB server hosting the stored user data. 
 
 ## Dependencies & Technologies Used: 
-__All dependencies can be installed with "npm i NAME" where name is listed below:__
+__All dependencies can be installed with `npm i NAME` where name is listed below:__
 * ejs
 * express
 * cookie-parser
@@ -72,6 +72,8 @@ For the front-end, an example map is stored in JSON as follows:
 ]
 
 ```
+
+To test, once all dependencies are installed, `npm start` and then using a tool such as postman, connect with `localhost:3000` - or talk to all endpoints by doing something like `localhost:3000/map/create`.
 
 ## Back-End Authors:
 * Ian G (guyian@pdx.edu)
