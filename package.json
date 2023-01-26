@@ -20,13 +20,15 @@
   },
   "homepage": "https://github.com/ecomappah/Back-End-Ecomapper-Capstone-Project#readme",
   "dependencies": {
-    "ejs": "^3.1.8",
-    "express": "^4.18.2", 
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
     "http-errors": "~1.6.3",
+    "mongodb": "^4.13.0",
     "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
+    "pug": "2.0.0-beta11",
+    "whatwg-url": "^12.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
