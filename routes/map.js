@@ -6,8 +6,10 @@ let router = express.Router();
  * Root map endpoint, get request, returns all names including the team they belong to
  */
 
-router.get('/', (req, res, next) => {
-	res.send(JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8')));
+router.get("/", (req, res, next) => {
+  res.send(
+    JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8"))
+  );
 });
 
 /**
@@ -15,27 +17,33 @@ router.get('/', (req, res, next) => {
  * The name and team must be specified to create a new entry.
  */
 
-router.post('/create', function (req, res, next) {
-    // Grab the parameters from the request body that we need
-    const { name } = req.body;
+router.post("/create", function (req, res, next) {
+  // Grab the parameters from the request body that we need
+  const { name } = req.body;
 
-    // Ensure name and team are specified
-    if (!name) {
-        res.status(400).send("Must specify name!");
+  // Ensure name and team are specified
+  if (!name) {
+    res.status(400).send("Must specify name!");
+  }
+
+  // This assumes the file already exists (and it should)
+  let json = JSON.parse(
+    fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8")
+  );
+
+  // Add name and team to JSON
+  json.push({ name });
+
+  // Write new changes to file
+  fs.writeFile(
+    __dirname + "/../public/tempDB.json",
+    JSON.stringify(json),
+    function (err) {
+      if (err) {
+        res.status(400).send("Issue writing file!");
+      }
     }
-
-    // This assumes the file already exists (and it should)
-    let json = JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8'));
-
-    // Add name and team to JSON
-    json.push({name});
-
-    // Write new changes to file
-    fs.writeFile(__dirname + "/../public/tempDB.json", JSON.stringify(json), function (err) {
-        if (err) {
-            res.status(400).send("Issue writing file!");
-        }
-    });
+  );
 
   // Send JSON with new changes
   res.send(json);
@@ -47,7 +55,9 @@ router.post('/create', function (req, res, next) {
 
 router.get("/get", function (req, res, next) {
   const { userID } = req.body;
-  let inDb = JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8'));
+  let inDb = JSON.parse(
+    fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8")
+  );
   const found = inDb.find((inDBobj) => inDBobj.userID === userID);
 
   if (found) {
@@ -66,16 +76,24 @@ router.get("/get", function (req, res, next) {
 
 router.patch("/update", function (req, res, next) {
   const { relationshipID, update } = req.body;
-  let inDB = JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8'));
-  const found = inDB.findIndex((inDBobj) => inDBobj.relationshipID === relationshipID);
+  let inDB = JSON.parse(
+    fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8")
+  );
+  const found = inDB.findIndex(
+    (inDBobj) => inDBobj.relationshipID === relationshipID
+  );
 
   if (found !== -1) {
     Object.assign(inDB[found], update);
-    fs.writeFile(__dirname + "/../public/tempDB.json", JSON.stringify(inDB), function (err) {
+    fs.writeFile(
+      __dirname + "/../public/tempDB.json",
+      JSON.stringify(inDB),
+      function (err) {
         if (err) {
           res.status(400).send("Issue writing file!");
         }
-    });
+      }
+    );
     res.status(200).json(inDB[found]);
   } else {
     res.status(404).json({ mess: "relationship not found" });
@@ -84,33 +102,40 @@ router.patch("/update", function (req, res, next) {
 
 /**
  * Delete endpoint, which takes unique relationshipID from the request body.
- * Use a unique relationshipID to help increase specificity, which allows for 
+ * Use a unique relationshipID to help increase specificity, which allows for
  * multiple removals if there are duplicates - or no removals if there are no matches.
  */
-router.delete('/delete', function (req, res, next) {
-    // Grab the parameters from the request body that we need
-    const {relationshipID} = req.body;
+router.delete("/delete", function (req, res, next) {
+  // Grab the parameters from the request body that we need
+  const { relationshipID } = req.body;
 
-    // Ensure unique relationshipID is specified
-    if (!relationshipID) {
-        res.status(400).send("Must specify unique relationship ID!");
+  // Ensure unique relationshipID is specified
+  if (!relationshipID) {
+    res.status(400).send("Must specify unique relationship ID!");
+  }
+
+  // This assumes the file already exists (and it should)
+  let json = JSON.parse(
+    fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8")
+  );
+
+  // Remove relationship with matching ID. Not entirely sure if written properly.
+  // This also removes duplicate instances
+  json = json.filter(function (e) {
+    return e.relationshipID !== relationshipID;
+  });
+
+  // Write new changes to file
+  fs.writeFile(
+    __dirname + "/../public/tempDB.json",
+    JSON.stringify(json),
+    function (err) {
+      if (err) {
+        res.status(400).send("Issue writing file!");
+      }
     }
-
-    // This assumes the file already exists (and it should)
-    let json = JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", 'utf-8'));
-
-    // Remove relationship with matching ID. Not entirely sure if written properly. 
-    // This also removes duplicate instances
-    json = json.filter(function (e) {
-        return e.relationshipID !== relationshipID;
-    });
-
-    // Write new changes to file
-    fs.writeFile(__dirname + "/../public/tempDB.json", JSON.stringify(json), function (err) {
-        if (err) {
-            res.status(400).send("Issue writing file!");
-        }
-    });
+  );
+});
 
 // Returns all the nodes in the map
 router.get("/node", (req, res) => {
@@ -177,6 +202,7 @@ router.patch("/node/update", (req, res) => {
     res.status(200).json(nodeArr);
   } else {
     res.status(400).json({ message: "Node not found" });
+  }
 });
 
 module.exports = router;
