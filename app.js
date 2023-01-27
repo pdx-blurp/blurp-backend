@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var developersRouter = require('./routes/developers')
 var userRouter = require("./routes/landing")
 var mapRouter = require('./routes/map')
+var relationshipsRouter = require('./routes/relationship')
 
 var mapRouter = require("./routes/map");
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/developers', developersRouter)
 app.use('/map', mapRouter);
+app.use('/map/relationship', relationshipsRouter)
 
 app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
