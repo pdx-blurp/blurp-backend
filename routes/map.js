@@ -1,22 +1,54 @@
 let express = require("express");
 const fs = require("fs");
 let router = express.Router();
+const { client } = require("./dbhandler")
 
 /**
- * Root map endpoint, get request, returns all names including the team they belong to
+ * Root map endpoint, expects a userID value and returns a list of objects that contain userName
+ * and mapID that the userID owns. 
  */
 
+<<<<<<< HEAD
 router.get("/", (req, res, next) => {
   res.send(
     JSON.parse(fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8"))
   );
+=======
+router.get('/', (req, res, next) => {
+  // Expects userID
+  const { userID } =  req.body
+
+  // Ensure userID is specified
+  if (!userID && userID !== 0) {
+    res.status(400).send("Must specify userID!");
+  }
+  else {
+    // Connect to the database
+    client.connect(() => {
+      // Navigate to the correct database and collection
+      let database = client.db("blurp")
+      let collection = database.collection("maps")
+
+      // Find user by userID
+      collection.find({ userID: userID })
+        .toArray()
+        .then((ans) => {
+          if(ans.length === 0)
+            res.status(400).json({error: "Could not find user"})
+          else
+            res.status(200).json(ans)
+        })
+    })
+  }
+>>>>>>> 0a86fc8... modified /map endpoints to engage w/ database
 });
 
 /**
- * Create endpoint, which takes name and team parameters from the request body.
- * The name and team must be specified to create a new entry.
+ * Create endpoint, expects a userID value and creates a new (empty) map document in MongoDB,
+ * populating userID, mapID, nodes, and relationships.
  */
 
+<<<<<<< HEAD
 router.post("/create", function (req, res, next) {
   // Grab the parameters from the request body that we need
   const { name } = req.body;
@@ -44,37 +76,85 @@ router.post("/create", function (req, res, next) {
       }
     }
   );
+=======
+router.post('/create', function (req, res, next) {
+    // Grab the parameters from the request body that we need, userId
+    const { userID } = req.body;
 
-  // Send JSON with new changes
-  res.send(json);
+    // Ensure userID is specified
+  if (!userID && userID !== 0) {
+    res.status(400).send("Must specify userID!");
+  }
+  else {
+    // Connect to the database
+    client.connect(() => {
+      // Navigate to the correct database and collection
+      let database = client.db("blurp")
+      let collection = database.collection("maps")
+>>>>>>> 0a86fc8... modified /map endpoints to engage w/ database
+
+      // Add an empty map with userID, empty node array and empty relationships array
+      let nodes = []
+      let relationships = []
+      collection.insertOne({ userID: userID, mapID: randomUUID(), nodes: nodes, relationships: relationships})
+        .then(result => {
+          res.status(200).json(result)
+        })
+        .catch(err => {
+          res.status(400).json({error: "Could not create new map"})
+        })
+    })
+  }
 });
 
 /**
- * Get endpoint, which takes the userID parameter and returns the users map
+ * Get endpoint, expects mapID and returns all data in a map document, can be the raw JSON object.
  */
 
 router.get("/get", function (req, res, next) {
+<<<<<<< HEAD
   const { userID } = req.body;
   let inDb = JSON.parse(
     fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8")
   );
   const found = inDb.find((inDBobj) => inDBobj.userID === userID);
+=======
+  // Expects mapID
+  const { mapID } = req.body;
+>>>>>>> 0a86fc8... modified /map endpoints to engage w/ database
 
-  if (found) {
-    const user = inDb.filter((inDBobj) => inDBobj.userID === userID);
-    res.status(200).json(user);
-  } else {
-    res.status(404).json({ message: "User not found" });
+  // Ensure mapID is specified
+  if (!mapID && mapID !== 0) {
+    res.status(400).send("Must specify mapID!");
+  }
+  else {
+    // Connect to the database
+    client.connect(() => {
+      // Navigate to the correct database and collection
+      let database = client.db("blurp")
+      let collection = database.collection("maps")
+
+      // Find map by mapID
+      collection.find({ mapID: mapID })
+        .toArray()
+        .then((ans) => {
+          if(ans.length === 0)
+            res.status(400).json({ error: "Could not find map"})
+          else
+            res.status(200).json(ans)
+        })
+    })
   }
 });
 
 /**
- * Update endpoint, which takes the relationshipID parameter and updates the relationship
- * NOTE: "update" for this data structure should have some of (but not necessarily all of)
- * nodeOne, nodeTwo, description, relationshipType
+ * Update endpoint, expects userID, newUserID, and mapID. Checks to see if user is trying to update a node/relationship
+ * array, resulting in a failure. Then checks if user owns the map. If user owns the map, then update userID with
+ * newUserID, else failure. 
  */
 
 router.patch("/update", function (req, res, next) {
+<<<<<<< HEAD
   const { relationshipID, update } = req.body;
   let inDB = JSON.parse(
     fs.readFileSync(__dirname + "/../public/tempDB.json", "utf-8")
@@ -97,10 +177,63 @@ router.patch("/update", function (req, res, next) {
     res.status(200).json(inDB[found]);
   } else {
     res.status(404).json({ mess: "relationship not found" });
+=======
+  // Expect userID, newUserID, and mapID
+  const { userID, newUserID, mapID } = req.body
+  
+  // Ensure userID, newUserID and mapID is specified
+  if (!userID && userID !== 0) {
+    res.status(400).send("Must specify userID!");
+  }  
+  else if(!newUserID && newUserID !== 0) {
+    res.status(400).send("Must specify newUserID!");
+  }
+  else if(!mapID) {
+    res.status(400).send("Must specify mapID!");
+  }
+  // Ensure newUserID is not node/relationships array
+  else if(Array.isArray(newUserID)) {
+    res.status(400).send("Cannot specify an array!");
+  }
+  else {
+    // Connect to the database
+    client.connect(() => {
+      // Navigate to the correct database and collection
+      let database = client.db("blurp")
+      let collection = database.collection("maps")
+
+      // Find map by MapID
+      collection.find({ mapID: mapID})
+        .toArray()
+        .then((ans) => {
+          if(ans.length === 0)
+            // Couldnt find map
+            res.status(400).json({ error: "Could not find map"})
+          else {
+            // Check if user owns the map by comparing userIDs
+            let found = ans.find((inMap) => inMap.userID === userID)
+
+            if(found) {
+              // Update userID with newUserID for that map
+              collection.updateOne({ mapID: mapID }, { $set: {userID: newUserID}})
+                .then(result => {
+                  res.status(200).json(result)
+                })
+                .catch(err => {
+                  res.status(400).json({error: "Could not fetch map"})
+                })
+            }
+            else 
+              res.status(400).json({error: "UserID does not own the map"})
+          }
+        })
+    }) 
+>>>>>>> 0a86fc8... modified /map endpoints to engage w/ database
   }
 });
 
 /**
+<<<<<<< HEAD
  * Delete endpoint, which takes unique relationshipID from the request body.
  * Use a unique relationshipID to help increase specificity, which allows for
  * multiple removals if there are duplicates - or no removals if there are no matches.
@@ -135,6 +268,56 @@ router.delete("/delete", function (req, res, next) {
       }
     }
   );
+=======
+ * Delete endpoint, expects a mapID and userID. then check if the user owns the map. If user owns the
+ * map, then drop the document from the database, else failure.
+ */
+router.delete('/delete', function (req, res, next) {
+  // Expects mapID and userID
+  const { mapID, userID } = req.body;
+
+  // Ensure mapID and userID is specified
+  if (!mapID && mapID !== 0) {
+    res.status(400).send("Must specify mapID!");
+  }  
+  else if(!userID && userID !== 0) {
+    res.status(400).send("Must specify userID!");
+  }
+  else {
+    // Connect to the database
+    client.connect(() => {
+      // Navigate to the correct database and collection
+      let database = client.db("blurp")
+      let collection = database.collection("maps")
+
+      // Find map by MapID
+      collection.find({ mapID: mapID})
+        .toArray()
+        .then((ans) => {
+          if(ans.length === 0)
+            // Couldnt find map
+            res.status(400).json({ error: "Could not find map"})
+          else {
+            // Check if user owns the map by comparing userIDs
+            let found = ans.find((inMap) => inMap.userID === userID)
+
+            if(found) {
+              // Delete map by mapID
+              collection.deleteOne({ mapID: mapID})
+                .then(result => {
+                  res.status(200).json(result)
+                })
+                .catch(err => {
+                  res.status(400).json({error: "Could not fetch map"})
+                })
+            }
+            else 
+              res.status(400).json({error: "UserID does not own the map"})
+          }
+        })
+    })
+  }
+>>>>>>> 0a86fc8... modified /map endpoints to engage w/ database
 });
 
 // Returns all the nodes in the map
