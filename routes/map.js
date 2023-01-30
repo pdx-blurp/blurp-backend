@@ -126,7 +126,7 @@ router.patch("/update", function (req, res, next) {
   }
   // Ensure newUserID is not node/relationships array
   else if(Array.isArray(newUserID)) {
-    res.status(400).send("Cannot specify array!");
+    res.status(400).send("Cannot specify an array!");
   }
   else {
     // Connect to the database
