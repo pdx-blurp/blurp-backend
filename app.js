@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const mongoose = require('mongoose')
+const userRoutes = require('./routes/user');
+
 var indexRouter = require('./routes/index');
 var developersRouter = require('./routes/developers')
 var userRouter = require("./routes/landing")
@@ -32,6 +35,8 @@ app.use('/map/relationship', relationshipsRouter)
 app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
 app.get('/pg2ex', userRouter);
+
+app.use('/user', userRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
