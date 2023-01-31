@@ -13,6 +13,34 @@ router.post("/create", function (req, res, next) {
   // Ensure node1, node2, and relationship are specified
   if (!node1 || !node2 || !relationship) {
     res.status(400).send("Must specify node1, node2, and relationship!");
+  }
+
+  client
+    .connect()
+    .then((response) => {
+      const database = client.db("newMongoDB");
+      const collection = database.collection("relationships");
+
+      collection
+        .insertOne({ node1: node1, node2: node2, relationship: relationship })
+        .then((doc) => {
+          res.status(200).send(doc);
+        })
+        .catch((err) => {
+          res.status(400).send({ message: "Relationship was not created" });
+          console.log(err);
+        });
+    })
+    .catch((err) => {
+      res.status(400).send({ message: "Database not connected" });
+    });
+  /*
+  // Grab the parameters from the request body that we need
+  const { node1, node2, relationship } = req.body;
+
+  // Ensure node1, node2, and relationship are specified
+  if (!node1 || !node2 || !relationship) {
+    res.status(400).send("Must specify node1, node2, and relationship!");
     return;
   }
 
@@ -39,6 +67,7 @@ router.post("/create", function (req, res, next) {
 
   // Send JSON with new changes
   res.send(json);
+  */
 });
 
 /**
