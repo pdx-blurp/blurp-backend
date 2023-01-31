@@ -33,6 +33,19 @@ app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
 app.get('/pg2ex', userRouter);
 
+app.post('/dataPrototypes', (req, res) => {
+  const dataPrototypes = req.body
+
+  db.collection('newMonngoDB')
+    .insertOne(dataPrototypes)
+    .then(result => {
+      res.status(201).json(result)
+    })
+    .catch(err => {
+      res.status(500).json({err: 'Couldnt not add data prototype'})
+    })
+})
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
