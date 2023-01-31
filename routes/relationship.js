@@ -14,11 +14,11 @@ router.post("/create", function (req, res, next) {
   if (!node1 || !node2 || !relationship) {
     res.status(400).send("Must specify node1, node2, and relationship!");
   }
-
+  //connects to the db
   client
     .connect()
     .then((response) => {
-      const database = client.db("newMongoDB");
+      const database = response.db("newMongoDB");
       const collection = database.collection("relationships");
 
       collection
@@ -34,40 +34,6 @@ router.post("/create", function (req, res, next) {
     .catch((err) => {
       res.status(400).send({ message: "Database not connected" });
     });
-  /*
-  // Grab the parameters from the request body that we need
-  const { node1, node2, relationship } = req.body;
-
-  // Ensure node1, node2, and relationship are specified
-  if (!node1 || !node2 || !relationship) {
-    res.status(400).send("Must specify node1, node2, and relationship!");
-    return;
-  }
-
-  // This assumes the file already exists (and it should)
-  let json = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
-  );
-
-  let id = crypto.randomUUID();
-
-  // Add to JSON
-  json.push({ id, node1, node2, relationship });
-
-  // Write new changes to file
-  fs.writeFile(
-    __dirname + "/../public/relationships.json",
-    JSON.stringify(json),
-    function (err) {
-      if (err) {
-        res.status(400).send("Issue writing file!");
-      }
-    }
-  );
-
-  // Send JSON with new changes
-  res.send(json);
-  */
 });
 
 /**
@@ -82,7 +48,32 @@ router.delete("/delete", function (req, res, next) {
     res.status(400).send("Must specify id!");
     return;
   }
+  /*
+  var id = new require("mongodb").ObjectID(id); //req.params.id
+  db.collection("users")
+    .findOne({ _id: id })
+    .then(function (doc) {
+      if (!doc) throw new Error("No record found.");
+      console.log(doc); //else case
+    });
+*/
 
+  const database = client.db("newMongoDB");
+  const collection = database.collection("relationships");
+  client.connect().then((response) => {
+    const found = false;
+    //compares id to document id's
+    collection
+      .findById({ id })
+      .then((doc) => {
+        console.log(doc);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  });
+
+  /*
   // This assumes the file already exists (and it should)
   let json = JSON.parse(
     fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
@@ -107,6 +98,7 @@ router.delete("/delete", function (req, res, next) {
 
   // Send JSON with new changes
   res.send(json);
+  */
 });
 
 /**
@@ -189,13 +181,22 @@ router.get("/get", function (req, res, next) {
  * Root endpoint, which sends all relationships.
  */
 router.get("/", function (req, res, next) {
-  // This assumes the file already exists (and it should)
-  let json = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
-  );
+  client
+    .connect()
+    .then((response) => {
+      const database = response.db("newMongoDB");
+      const collection = database.collection("relationships");
 
-  // Send all JSON
-  res.send(json);
+      collection.find({}).toArray(function (err, result) {
+        if (err) throw err;
+        res.send(result);
+        database.close();
+      });
+    })
+
+    .catch((err) => {
+      res.status(400).send({ message: "Database not connected" });
+    });
 });
 
 module.exports = router;
