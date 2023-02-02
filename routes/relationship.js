@@ -114,7 +114,13 @@ router.put("/update", function (req, res, next) {
     return;
   }
 
+  const database = client.db("newMongoDB");
+  const collection = database.collection("relationships");
+  client.connect().then((response) => {
+    const found = false;
   // This assumes the file already exists (and it should)
+  });
+/*
   let json = JSON.parse(
     fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
   );
@@ -148,6 +154,7 @@ router.put("/update", function (req, res, next) {
 
   // Send JSON with new changes
   res.send(json);
+*/
 });
 
 /**
@@ -162,7 +169,7 @@ router.get("/get", function (req, res, next) {
     res.status(400).send("Must specify id!");
     return;
   }
-
+/*
   // This assumes the file already exists (and it should)
   let json = JSON.parse(
     fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
@@ -175,6 +182,7 @@ router.get("/get", function (req, res, next) {
 
   // Send matched JSON
   res.send(matchedRecord);
+*/
 });
 
 /**
