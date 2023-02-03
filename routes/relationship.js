@@ -162,13 +162,30 @@ router.put("/update", function (req, res, next) {
  */
 router.get("/get", function (req, res, next) {
   // Grab the parameters from the request body that we need
-  const { id } = req.body;
+  const { mapid, relid } = req.body;
 
   // Ensure id is specified
-  if (!id) {
-    res.status(400).send("Must specify id!");
+  if (!mapid || !relid) {
+    res.status(400).send("Must specify mapid & relid!");
     return;
   }
+  client
+    .connect()
+    .then((response) => {
+      const database = response.db("blurp");
+      const collection = database.collection("maps");
+
+      collection.find({mapID: String(mapid)})
+		.project({relationships:1})
+		.toArray(function (err, result) {
+        if (err) throw err;
+        res.send(result);
+        //database.close();
+      });
+    })
+    .catch((err) => {
+      res.status(400).send({ message: "Database not connected" });
+    });
 /*
   // This assumes the file already exists (and it should)
   let json = JSON.parse(
@@ -189,19 +206,21 @@ router.get("/get", function (req, res, next) {
  * Root endpoint, which sends all relationships.
  */
 router.get("/", function (req, res, next) {
+  const { mapid } = req.body;
   client
     .connect()
     .then((response) => {
-      const database = response.db("newMongoDB");
-      const collection = database.collection("relationships");
+      const database = response.db("blurp");
+      const collection = database.collection("maps");
 
-      collection.find({}).toArray(function (err, result) {
+      collection.find({mapID: String(mapid)})
+		.project({relationships:1, _id:0})
+		.toArray(function (err, result) {
         if (err) throw err;
         res.send(result);
-        database.close();
+        //database.close();
       });
     })
-
     .catch((err) => {
       res.status(400).send({ message: "Database not connected" });
     });
