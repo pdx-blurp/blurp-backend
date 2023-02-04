@@ -174,17 +174,30 @@ router.get("/get", function (req, res, next) {
     .then((response) => {
       const database = response.db("blurp");
       const collection = database.collection("maps");
-
-      collection.find({mapID: String(mapid)})
-		.project({relationships:1})
+/*
+      collection.find({mapID: String(mapid), "relationships": {$elemMatch:  {relationshipID: 1}}})
+		.project({relationships:1, _id:0})
 		.toArray(function (err, result) {
         if (err) throw err;
         res.send(result);
         //database.close();
       });
+*/
+		collection.aggregate([
+			{ $match: {mapID: '8734873454567456to9'} },
+  			{ $unwind: "$relationships" },
+  			{ $match: { 'relationships.description': "Wife"}},
+  			{ $project: { relationships: 1, _id:0}}	
+		])
+		.toArray()
+		.then(output => {
+			console.log(output)
+			res.send(output)
+		});
     })
     .catch((err) => {
       res.status(400).send({ message: "Database not connected" });
+	  console.log(err);
     });
 /*
   // This assumes the file already exists (and it should)
