@@ -8,23 +8,58 @@ const { client } = require("./dbhandler");
  */
 router.post("/create", function (req, res, next) {
   // Grab the parameters from the request body that we need
-  const { node1, node2, relationship } = req.body;
+  const { mapID, relationshipinfo } = req.body;
 
   // Ensure node1, node2, and relationship are specified
-  if (!node1 || !node2 || !relationship) {
-    res.status(400).send("Must specify node1, node2, and relationship!");
+  const relModel = [
+    'nodeOne', 'nodeTwo', 'description', 'type', 'stress', 'familiarity'
+  ]
+  if (!mapID) {
+    res.status(400).send("Must specify map!");
+    return;
+  }
+  else if (!(relationshipinfo && relModel.every((i) => relationshipinfo.hasOwnProperty(i)))) {
+    let responseString = "relationshipinfo must have these keys: " + relModel.join(', ');
+    res.status(400).send(responseString);
+    return;
   }
   //connects to the db
   client
     .connect()
     .then((response) => {
-      const database = response.db("newMongoDB");
-      const collection = database.collection("relationships");
+      const database = response.db("blurp");
+      const collection = database.collection("maps");
+
+      let relationshipData = {
+        'relationshipID': crypto.randomUUID(),
+        'nodePair': {
+          'nodeOne': relationshipinfo.nodeOne,
+          'nodeTwo': relationshipinfo.nodeTwo,
+        },
+        'description': relationshipinfo.description,
+        'relationshipType': {
+          'type': relationshipinfo.type,
+          'stressCode': relationshipinfo.stress,
+          'familiarity': relationshipinfo.familiarity
+        }
+      };
+
+      console.log(relationshipData);
+      console.log(mapID);
 
       collection
-        .insertOne({ node1: node1, node2: node2, relationship: relationship })
-        .then((doc) => {
-          res.status(200).send(doc);
+        .updateOne(
+          { mapID: mapID },
+          { $push: { "relationships": relationshipData}}
+        )
+        .then((output) => {
+          console.log(output);
+          if (output.modifiedCount === 1 && output.matchedCount === 1) {
+            res.status(200).send({ message: "Relationship deleted"});
+          }
+          else if (output.matchedCount === 0) {
+            res.status(400).send({ message: "Relationship not created"}); 
+          }
         })
         .catch((err) => {
           res.status(400).send({ message: "Relationship was not created" });
@@ -41,64 +76,37 @@ router.post("/create", function (req, res, next) {
  */
 router.delete("/delete", function (req, res, next) {
   // Grab the parameters from the request body that we need
-  const { id } = req.body;
+  const { mapID, relationshipID } = req.body;
 
   // Ensure id is specified
-  if (!id) {
-    res.status(400).send("Must specify id!");
+  if (!mapID || !relationshipID) {
+    res.status(400).send("Must specify map and relationship!");
     return;
   }
-  /*
-  var id = new require("mongodb").ObjectID(id); //req.params.id
-  db.collection("users")
-    .findOne({ _id: id })
-    .then(function (doc) {
-      if (!doc) throw new Error("No record found.");
-      console.log(doc); //else case
-    });
-*/
-
-  const database = client.db("newMongoDB");
-  const collection = database.collection("relationships");
   client.connect().then((response) => {
-    const found = false;
-    //compares id to document id's
-    collection
-      .findById({ id })
-      .then((doc) => {
-        console.log(doc);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  });
-
-  /*
-  // This assumes the file already exists (and it should)
-  let json = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
-  );
-
-  // Remove by id from json
-  // This also removes duplicate instances
-  json = json.filter(function (e) {
-    return e.id !== id;
-  });
-
-  // Write new changes to file
-  fs.writeFile(
-    __dirname + "/../public/relationships.json",
-    JSON.stringify(json),
-    function (err) {
-      if (err) {
-        res.status(400).send("Issue writing file!");
+    const database = client.db("blurp");
+    const collection = database.collection("maps");
+    collection.updateOne(
+      { mapID: mapID, "relationships.relationshipID": relationshipID},
+      { $pull: { "relationships": {"relationshipID": relationshipID}} }
+    )
+    .then((output) => {
+      if (output.modifiedCount === 1 && output.matchedCount === 1) {
+        res.status(200).send({ message: "Relationship deleted"});
       }
-    }
-  );
-
-  // Send JSON with new changes
-  res.send(json);
-  */
+      else if (output.matchedCount === 0) {
+        res.status(400).send({ message: "Relationship not found"});
+      }
+    })
+    .catch((err) => {
+      res.status(400).send({ message: err });
+	    console.log(err);
+    });
+  })
+  .catch((err) => {
+    res.status(400).send({ message: "Database not connected" });
+	  console.log(err);
+  });
 });
 
 /**
@@ -106,55 +114,44 @@ router.delete("/delete", function (req, res, next) {
  */
 router.put("/update", function (req, res, next) {
   // Grab the parameters from the request body that we need
-  const { id, relationship } = req.body;
+  const { mapID, relationshipID, changes } = req.body;
 
   // Ensure id is specified
-  if (!id || !relationship) {
-    res.status(400).send("Must specify id and relationship!");
+  if (!mapID || !relationshipID) {
+    res.status(400).send("Must specify map and relationship!");
     return;
   }
 
-  const database = client.db("newMongoDB");
-  const collection = database.collection("relationships");
+
   client.connect().then((response) => {
-    const found = false;
+    //const found = false;
+    const database = client.db("blurp");
+    const collection = database.collection("maps");
+    let updates = {};
+    for (const [k, v] of Object.entries(changes)) {
+      updates['relationships.$[rel].' + k] = v;
+    }
+    collection.updateOne(
+      { mapID: mapID, "relationships.relationshipID": relationshipID},
+      { $set: updates },
+      { arrayFilters: [
+          {"rel.relationshipID": relationshipID}
+      ]}
+    )
+    .then((output) => {
+      if (output.modifiedCount === 1 && output.matchedCount === 1) {
+        res.status(200).send({ message: "Relationship updated"});
+      }
+      else if (output.matchedCount === 0) {
+        res.status(400).send({ message: "Relationship not found"});
+      }
+    })
+    .catch((err) => {
+      res.status(400).send({ message: "Database not connected" });
+	  console.log(err);
+    });
   // This assumes the file already exists (and it should)
   });
-/*
-  let json = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
-  );
-
-  // Grab the record to update
-  let recordToUpdate = json.filter(function (e) {
-    return e.id === id;
-  })[0];
-  // Remove the record by id to add later
-  json = json.filter(function (e) {
-    return e.id !== id;
-  });
-
-  recordToUpdate.relationship = relationship;
-  let node1 = recordToUpdate.node1;
-  let node2 = recordToUpdate.node2;
-
-  // Add name and team to JSON
-  json.push({ id, node1, node2, relationship });
-
-  // Write new changes to file
-  fs.writeFile(
-    __dirname + "/../public/relationships.json",
-    JSON.stringify(json),
-    function (err) {
-      if (err) {
-        res.status(400).send("Issue writing file!");
-      }
-    }
-  );
-
-  // Send JSON with new changes
-  res.send(json);
-*/
 });
 
 /**
@@ -174,15 +171,6 @@ router.get("/get", function (req, res, next) {
     .then((response) => {
       const database = response.db("blurp");
       const collection = database.collection("maps");
-/*
-      collection.find({mapID: String(mapid), "relationships": {$elemMatch:  {relationshipID: 1}}})
-		.project({relationships:1, _id:0})
-		.toArray(function (err, result) {
-        if (err) throw err;
-        res.send(result);
-        //database.close();
-      });
-*/
 		collection.aggregate([
 			{ $match: {mapID: '8734873454567456to9'} },
   			{ $unwind: "$relationships" },
@@ -199,20 +187,6 @@ router.get("/get", function (req, res, next) {
       res.status(400).send({ message: "Database not connected" });
 	  console.log(err);
     });
-/*
-  // This assumes the file already exists (and it should)
-  let json = JSON.parse(
-    fs.readFileSync(__dirname + "/../public/relationships.json", "utf-8")
-  );
-
-  // Grab the record to update
-  let matchedRecord = json.filter(function (e) {
-    return e.id === id;
-  })[0];
-
-  // Send matched JSON
-  res.send(matchedRecord);
-*/
 });
 
 /**
