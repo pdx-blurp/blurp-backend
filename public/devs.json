@@ -1,50 +1,50 @@
 [
-  {
-    "name": "Ilias Bonie",
-    "team": "Frontend"
-  },
-  {
-    "name": "Brandon Gatewood",
-    "team": "DevOps"
-  },
-  {
-    "name": "Dalia Ramos-Hernandez",
-    "team": "Backend"
-  },
-  {
-    "name": "Daniel Trang",
-    "team": "Lead"
-  },
-  {
-    "name": "Fan Yang",
-    "team": "Frontend"
-  },
-  {
-    "name": "Ian Guy",
-    "team": "Backend"
-  },
-  {
-    "name": "Jacob Landstrom",
-    "team": "Backend"
-  },
-  {
-    "name": "Jacob Strong",
-    "team": "DevOps"
-  },
-  {
-    "name": "Jaime McCarthy",
-    "team": "Lead"
-  },
-  {
-    "name": "Thomas Gardner",
-    "team": "Frontend"
-  },
-  {
-    "name": "Timofey Shichalin",
-    "team": "Frontend"
-  },
-  {
-    "name": "Truc Ngo",
-    "team": "Backend"
-  }
+	{
+		"name": "Ilias Bonie",
+		"team": "Frontend"
+	},
+	{
+		"name": "Brandon Gatewood",
+		"team": "DevOps"
+	},
+	{
+		"name": "Dalia Ramos-Hernandez",
+		"team": "Backend"
+	},
+	{
+		"name": "Daniel Trang",
+		"team": "Lead"
+	},
+	{
+		"name": "Fan Yang",
+		"team": "Frontend"
+	},
+	{
+		"name": "Ian Guy",
+		"team": "Backend"
+	},
+	{
+		"name": "Jacob Landstrom",
+		"team": "Backend"
+	},
+	{
+		"name": "Jacob Strong",
+		"team": "DevOps"
+	},
+	{
+		"name": "Jaime McCarthy",
+		"team": "Lead"
+	},
+	{
+		"name": "Thomas Gardner",
+		"team": "Frontend"
+	},
+	{
+		"name": "Timofey Shichalin",
+		"team": "Frontend"
+	},
+	{
+		"name": "Truc Ngo",
+		"team": "Backend"
+	}
 ]
