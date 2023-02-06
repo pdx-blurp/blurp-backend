@@ -55,7 +55,7 @@ router.post("/create", function (req, res, next) {
         .then((output) => {
           console.log(output);
           if (output.modifiedCount === 1 && output.matchedCount === 1) {
-            res.status(200).send({ message: "Relationship deleted"});
+            res.status(200).send({ message: "Relationship created"});
           }
           else if (output.matchedCount === 0) {
             res.status(400).send({ message: "Relationship not created"}); 

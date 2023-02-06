@@ -1,8 +1,9 @@
 const { MongoClient } = require("mongodb");
+const fs = require("fs");
 
 // Connection URL
-const url =
-  "mongodb+srv://Blurp:Pdxgroupproject1!@cluster0.fxl2nvt.mongodb.net/?retryWrites=true&w=majority";
+const url = fs.readFileSync(__dirname + "/../../mongo.db", "utf-8");
+console.log(url);
 const client = new MongoClient(url);
 
 // Database Name
