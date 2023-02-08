@@ -162,8 +162,9 @@ router.patch("/update", function (req, res, next) {
 });
 
 /**
- * Delete endpoint, expects a mapID and userID. then check if the user owns the map. If user owns the
- * map, then drop the document from the database, else failure.
+ * Delete endpoint, which takes unique relationshipID from the request body.
+ * Use a unique relationshipID to help increase specificity, which allows for
+ * multiple removals if there are duplicates - or no removals if there are no matches.
  */
 router.delete('/delete', function (req, res, next) {
   // Expects mapID and userID
@@ -214,97 +215,6 @@ router.delete('/delete', function (req, res, next) {
           }
         })
     })
-  }
-});
-
-// Returns all the nodes in the map
-router.get("/node", (req, res) => {
-  res.send([
-    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
-    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
-  ]);
-});
-
-router.get("/node/get", (req, res) => {
-  const { userID } = req.body;
-  const nodeArr = [
-    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
-    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
-  ];
-  const found = nodeArr.find((node) => node.userID === userID);
-  if (found) {
-    const singleNode = nodeArr.filter((node) => node.userID === userID);
-    res.status(200).json(singleNode);
-  } else {
-    res.status(404).json({ message: "Node not found" });
-  }
-});
-
-router.post("/node/create", (req, res) => {
-  const { userID, mapID, name, color } = req.body;
-  const nodeArr = [
-    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
-    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
-  ];
-
-  nodeArr.push({ nodeID: 3, userID, mapID, name, color });
-  res.send(nodeArr);
-});
-
-router.delete("/node/delete", (req, res) => {
-  const { userID, mapID, nodeID } = req.body;
-  const nodeArr = [
-    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
-    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
-  ];
-
-  const found = false;
-  nodeArr.forEach((element, index) => {
-    if (
-      (element.nodeID === nodeID && element.userID === userID,
-      element.mapID === mapID)
-    ) {
-      nodeArr.splice(index, 1);
-      found = true;
-    }
-  });
-  if (found) {
-    res.status(200).json(nodeArr);
-  } else {
-    res.status(400).json({ message: "Node not found" });
-  }
-});
-
-router.patch("/node/update", (req, res) => {
-  const { userID, mapID, nodeID, name, color } = req.body;
-  const nodeArr = [
-    { nodeID: 1, userID: 1, mapID: 1, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 1, mapID: 1, name: "Lili", color: "Green" },
-    { nodeID: 1, userID: 2, mapID: 2, name: "Dalia", color: "Red" },
-    { nodeID: 2, userID: 2, mapID: 2, name: "Lili", color: "Green" },
-  ];
-
-  nodeArr.forEach((element, index) => {
-    if (
-      (element.nodeID === nodeID && element.userID === userID,
-      element.mapID === mapID)
-    ) {
-      nodeArr[index].name = name;
-      nodeArr[index].color = color;
-    }
-  });
-  if (found) {
-    res.status(200).json(nodeArr);
-  } else {
-    res.status(400).json({ message: "Node not found" });
   }
 });
 

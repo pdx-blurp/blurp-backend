@@ -12,7 +12,7 @@ router.post("/create", function (req, res, next) {
 
   // Ensure node1, node2, and relationship are specified
   const relModel = [
-    'nodeOne', 'nodeTwo', 'description', 'type', 'stress', 'familiarity'
+    'nodePair', 'description', 'relationshipType'
   ]
   if (!mapID) {
     res.status(400).send("Must specify map!");
@@ -29,23 +29,21 @@ router.post("/create", function (req, res, next) {
     .then((response) => {
       const database = response.db("blurp");
       const collection = database.collection("maps");
+      // TODO: check that two nodes actually exist
 
       let relationshipData = {
         'relationshipID': crypto.randomUUID(),
         'nodePair': {
-          'nodeOne': relationshipinfo.nodeOne,
-          'nodeTwo': relationshipinfo.nodeTwo,
+          'nodeOne': relationshipinfo.nodePair.nodeOne,
+          'nodeTwo': relationshipinfo.nodePair.nodeTwo
         },
         'description': relationshipinfo.description,
         'relationshipType': {
-          'type': relationshipinfo.type,
-          'stressCode': relationshipinfo.stress,
-          'familiarity': relationshipinfo.familiarity
+          'type': relationshipinfo.relationshipType.type,
+          'familiarity': relationshipinfo.relationshipType.familiarity,
+          'stressCode': relationshipinfo.relationshipType.stressCode
         }
       };
-
-      console.log(relationshipData);
-      console.log(mapID);
 
       collection
         .updateOne(
@@ -53,7 +51,6 @@ router.post("/create", function (req, res, next) {
           { $push: { "relationships": relationshipData}}
         )
         .then((output) => {
-          console.log(output);
           if (output.modifiedCount === 1 && output.matchedCount === 1) {
             res.status(200).send({ message: "Relationship created"});
           }
@@ -112,7 +109,7 @@ router.delete("/delete", function (req, res, next) {
 /**
  * Update endpoint, which takes the relationship id and relationship data to update.
  */
-router.put("/update", function (req, res, next) {
+router.patch("/update", function (req, res, next) {
   // Grab the parameters from the request body that we need
   const { mapID, relationshipID, changes } = req.body;
 
@@ -159,10 +156,10 @@ router.put("/update", function (req, res, next) {
  */
 router.get("/get", function (req, res, next) {
   // Grab the parameters from the request body that we need
-  const { mapid, relid } = req.body;
+  const { mapID, relationshipID } = req.body;
 
   // Ensure id is specified
-  if (!mapid || !relid) {
+  if (!mapID || !relationshipID) {
     res.status(400).send("Must specify mapid & relid!");
     return;
   }
@@ -172,13 +169,14 @@ router.get("/get", function (req, res, next) {
       const database = response.db("blurp");
       const collection = database.collection("maps");
 		collection.aggregate([
-			{ $match: {mapID: '8734873454567456to9'} },
+			{ $match: {mapID: mapID} },
   			{ $unwind: "$relationships" },
-  			{ $match: { 'relationships.description': "Wife"}},
+  			{ $match: { 'relationships.relationshipID': relationshipID}},
   			{ $project: { relationships: 1, _id:0}}	
 		])
 		.toArray()
 		.then(output => {
+      output = output[0].relationships;
 			console.log(output)
 			res.send(output)
 		});
@@ -193,18 +191,18 @@ router.get("/get", function (req, res, next) {
  * Root endpoint, which sends all relationships.
  */
 router.get("/", function (req, res, next) {
-  const { mapid } = req.body;
+  const { mapID } = req.body;
   client
     .connect()
     .then((response) => {
       const database = response.db("blurp");
       const collection = database.collection("maps");
 
-      collection.find({mapID: String(mapid)})
+      collection.find({mapID: String(mapID)})
 		.project({relationships:1, _id:0})
 		.toArray(function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).json(result);
         //database.close();
       });
     })
