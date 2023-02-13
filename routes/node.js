@@ -1,11 +1,12 @@
 let express = require("express");
 let router = express.Router();
 const crypto = require('crypto');
+const fs = require("fs");
 
 const {MongoClient} = require("mongodb");
 
 // Connection URL
-const url = "mongodb+srv://Blurp:Pdxgroupproject1!@cluster0.fxl2nvt.mongodb.net/?retryWrites=true&w=majority";
+const url = fs.readFileSync(__dirname + "/../../mongo.db", "utf-8");
 const client = new MongoClient(url);
 
 /**
@@ -104,7 +105,8 @@ router.post("/create", (req, res) => {
 			},
 			type: nodeinfo.type,
 			age: nodeinfo.age,
-			color: nodeinfo.color
+			color: nodeinfo.color,
+			groups: []
 		};
 		//collection.insertOne(newEntry)
 		collection.updateOne(

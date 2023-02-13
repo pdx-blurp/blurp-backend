@@ -147,7 +147,6 @@ router.patch("/update", function (req, res, next) {
       res.status(400).send({ message: "Database not connected" });
 	  console.log(err);
     });
-  // This assumes the file already exists (and it should)
   });
 });
 
@@ -202,7 +201,7 @@ router.get("/", function (req, res, next) {
 		.project({relationships:1, _id:0})
 		.toArray(function (err, result) {
         if (err) throw err;
-        res.status(200).json(result);
+        res.status(200).json(result[0].relationships);
         //database.close();
       });
     })

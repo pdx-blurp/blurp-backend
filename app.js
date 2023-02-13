@@ -10,6 +10,7 @@ let userRouter = require("./routes/landing")
 let mapRouter = require("./routes/map");
 let relationshipsRouter = require('./routes/relationship')
 let nodesRouter = require('./routes/node')
+let groupsRouter = require('./routes/group')
 let developersRouter = require('./routes/developers')
 
 let app = express();
@@ -29,6 +30,7 @@ app.use('/developers', developersRouter)
 app.use('/map', mapRouter)
 app.use('/map/relationship', relationshipsRouter)
 app.use('/map/node', nodesRouter)
+app.use('/map/group', groupsRouter)
 
 app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
