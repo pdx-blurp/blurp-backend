@@ -61,7 +61,8 @@ router.post('/create', function (req, res, next) {
       // Add an empty map with userID, empty node array and empty relationships array
       let nodes = []
       let relationships = []
-      collection.insertOne({ userID: userID, mapID: crypto.randomUUID(), nodes: nodes, relationships: relationships})
+      let groups = []
+      collection.insertOne({ userID: userID, mapID: crypto.randomUUID(), nodes: nodes, relationships: relationships, groups: groups})
         .then(result => {
           res.status(200).json(result)
         })
