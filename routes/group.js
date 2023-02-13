@@ -62,10 +62,56 @@ router.get('/get', function (req, res, next) {
 
 
 router.post('/create', function (req, res, next) {
-    
-    console.log(req.body);
-    res.status(200).json({msg: req.body});
+    const { mapID, groupinfo } = req.body;
+
+  // Ensure node1, node2, and group are specified
+  const grpModel = [
+    'groupName', 'description'
+  ]
+  if (!mapID) {
+    res.status(400).send("Must specify mapID!");
     return;
+  }
+  else if (!(groupinfo && grpModel.every((i) => groupinfo.hasOwnProperty(i)))) {
+    let responseString = "groupinfo must have these keys: " + grpModel.join(', ');
+    res.status(400).send(responseString);
+    return;
+  }
+  //connects to the db
+  client
+    .connect()
+    .then((response) => {
+      const database = response.db("blurp");
+      const collection = database.collection("maps");
+      // TODO: check that two nodes actually exist
+
+      let groupData = {
+        'groupName': groupinfo.groupName,
+        'groupID': crypto.randomUUID(),
+        'description': groupinfo.description
+      };
+
+      collection
+        .updateOne(
+          { mapID: mapID },
+          { $push: { "groups": groupData}}
+        )
+        .then((output) => {
+          if (output.modifiedCount === 1 && output.matchedCount === 1) {
+            res.status(200).send({ message: "Group created"});
+          }
+          else if (output.matchedCount === 0) {
+            res.status(400).send({ message: "Group not created"}); 
+          }
+        })
+        .catch((err) => {
+          res.status(400).send({ message: "Group was not created" });
+          console.log(err);
+        });
+    })
+    .catch((err) => {
+      res.status(400).send({ message: "Database not connected" });
+    });
 });
 
 router.patch("/update", function (req, res, next) {
