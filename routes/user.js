@@ -1,8 +1,5 @@
 const express =  require('express');
 
-// controlle functions
-const { signupUser, loginUser } = require('../controllers/userController')
-
 const router = express.Router();
 
 // login route
@@ -28,8 +25,6 @@ router.patch('/:id', (req,res) => {
     res.json({mssg: "Update a user"});
 });
 
-//signup route
-router.post('/signup', signupUser)
 
 
 module.exports = router
