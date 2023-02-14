@@ -4,6 +4,11 @@ let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
+// goole Oauth
+const {OAuth2Client} = require('google-auth-library');
+const CLIENT_ID = '220935592619-e7j93usk2h7vhcuoauos59rhgvqlcmsa.apps.googleusercontent.com'
+const client = new OAuth2Client(CLIENT_ID);
+
 let indexRouter = require('./routes/index');
 let userRouter = require("./routes/landing")
 
@@ -11,6 +16,9 @@ let mapRouter = require("./routes/map");
 let relationshipsRouter = require('./routes/relationship')
 let nodesRouter = require('./routes/node')
 let developersRouter = require('./routes/developers')
+
+// google Oauth routes
+let googleOauthRouter = require('./routes/googleOauth');
 
 let app = express();
 
@@ -29,6 +37,8 @@ app.use('/developers', developersRouter)
 app.use('/map', mapRouter)
 app.use('/map/relationship', relationshipsRouter)
 app.use('/map/node', nodesRouter)
+
+app.use('/googleOauth', googleOauthRouter)
 
 app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
