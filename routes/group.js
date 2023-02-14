@@ -3,7 +3,7 @@ let router = express.Router();
 const crypto = require("crypto");
 const { client } = require("./dbhandler")
 
-router.get('/', function (req, res, next) {
+router.post('/', function (req, res, next) {
 	const {mapID} = req.body;
 
 	if (!mapID) {
@@ -29,7 +29,7 @@ router.get('/', function (req, res, next) {
     })
 });
 
-router.get('/get', function (req, res, next) {
+router.post('/get', function (req, res, next) {
     const {mapID, groupID} = req.body;
 
 	if (!mapID || !groupID) {
