@@ -2,7 +2,7 @@ const { MongoClient } = require("mongodb");
 const fs = require("fs");
 
 // Connection URL
-const url = fs.readFileSync(__dirname + "/../../mongo.db", "utf-8");
+const url = fs.readFileSync(__dirname + "/../mongo.db", "utf-8");
 const client = new MongoClient(url);
 
 // Database Name
