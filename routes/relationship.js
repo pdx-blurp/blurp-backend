@@ -47,6 +47,7 @@ router.post("/create", function (req, res, next) {
 					type: relationshipinfo.relationshipType.type,
 					familiarity: relationshipinfo.relationshipType.familiarity,
 					stressCode: relationshipinfo.relationshipType.stressCode,
+					size: relationshipinfo.relationshipType.size,
 				},
 			};
 

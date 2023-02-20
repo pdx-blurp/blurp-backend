@@ -112,6 +112,7 @@ router.post("/create", (req, res) => {
 			age: nodeinfo.age,
 			color: nodeinfo.color,
 			groups: [],
+			size: nodeinfo.size,
 		};
 		//collection.insertOne(newEntry)
 		collection
