@@ -99,7 +99,6 @@ router.post("/create", (req, res) => {
 		const newEntry = {
 			nodeName: nodeinfo.nodeName,
 			nodeID: nodeinfo.nodeID,
-			color: nodeinfo.color,
 			description: nodeinfo.description,
 			pos: {
 				x: nodeinfo.pos.x,
@@ -109,6 +108,7 @@ router.post("/create", (req, res) => {
 			age: nodeinfo.age,
 			color: nodeinfo.color,
 			groups: [],
+			size: nodeinfo.size,
 		};
 		//collection.insertOne(newEntry)
 		collection
