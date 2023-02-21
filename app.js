@@ -38,7 +38,7 @@ app.use('/map', mapRouter)
 app.use('/map/relationship', relationshipsRouter)
 app.use('/map/node', nodesRouter)
 
-app.use('/googleOauth', googleOauthRouter)
+app.use('/', googleOauthRouter)
 
 app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
