@@ -61,20 +61,16 @@ router.post("/create", function (req, res, next) {
 			// Navigate to the correct database and collection
 			let database = client.db("blurp");
 			let collection = database.collection("maps");
-
 			// Add an empty map with userID, empty node array and empty relationships array
 			let nodes = [];
 			let relationships = [];
 			let groups = [];
-			let map = crypto.randomUUID();
 			collection
-				.insertOne({ userID: userID, mapID: map, nodes: nodes, relationships: relationships, groups: groups })
+				.insertOne({ userID: userID, mapID: crypto.randomUUID(), nodes: nodes, relationships: relationships, groups: groups })
 				.then((result) => {
-					console.log(result);
-					res.status(200).json({ result: result, mapID: map });
+					res.status(200).json(result);
 				})
 				.catch((err) => {
-					console.log(err);
 					res.status(400).json({ error: "Could not create new map" });
 				});
 		});
