@@ -16,6 +16,7 @@ let developersRouter = require('./routes/developers')
 
 let loginRouter = require('./routes/login');
 let testLoginRouter = require('./routes/test_login');
+let userDataRouter = require('./routes/userdata');
 
 let app = express();
 
@@ -53,6 +54,7 @@ app.get('/test_login', userRouter);
 
 app.use('/login', loginRouter);
 app.use('/test-login', testLoginRouter);
+app.use('/userdata', userDataRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
