@@ -2,7 +2,7 @@ let express = require("express");
 var passport = require('passport');
 
 let router = express.Router();
-// router.use();
+let redirect_to = 'http://localhost:3000/test-login';
 
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
@@ -23,12 +23,17 @@ passport.use(new GoogleStrategy({
   }
 ));
 
-router.get('/google', passport.authenticate('google', { scope: ['profile'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile'], accessType: 'offline', prompt: 'consent'}));
 
 router.get('/google/redirect',
   passport.authenticate('google', {failureRedirect: '/'}),
   function(req, res) {
-    res.redirect(`http://localhost:5173?access_token=${accessTokenStore}`);
+    console.log("Session ID:", req.sessionID);
+    req.session.refreshToken = refreshTokenStore;
+    req.session.accessToken = accessTokenStore;
+    req.session.profile = profileStore;
+    req.session.user_google_id = profileStore.id; // Get unique user Google ID
+    res.redirect(redirect_to);
   }
 );
 
