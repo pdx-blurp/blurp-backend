@@ -1,8 +1,14 @@
 let express = require("express");
 var passport = require('passport');
+let cors = require('cors');
 
 let router = express.Router();
-let redirect_to = 'http://localhost:3000/test-login';
+router.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Credentials', true);
+  next();
+});
 
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 
@@ -32,10 +38,37 @@ router.get('/google/redirect',
     req.session.refreshToken = refreshTokenTemp;
     req.session.accessToken = accessTokenTemp;
     req.session.profile = profileTemp;
-    req.session.user_google_id = profileTemp.id; // Get unique user Google ID
-    res.redirect(redirect_to);
+    req.session.userGoogleId = profileTemp.id; // Get unique user Google ID
+    req.session.loggedIn = 'true';
+
+    // Set loggedIn cookie and profilePicUrl cookie for the browser.
+    // These cookies will expire when the session expires
+    res.cookie('loggedIn', 'true', {maxAge: 1000 * 60 * 5, httpOnly: false});
+    res.cookie('profilePicUrl', req.session.profile.photos[0].value,
+      {maxAge: 1000 * 60 * 5, httpOnly: false});
+    req.session.resetMaxAge();
+
+    res.redirect(`http://localhost:5173`);
   }
 );
+
+router.get('/isloggedin', cors({origin: 'http://localhost:5173'}), (req, res, next) => {
+  
+  let ret = 'false';
+  if(req.session.loggedIn) {
+    ret = 'true';
+  }
+  res.json(ret);
+});
+
+router.get('/google/logout', cors({origin: 'http://localhost:5173'}), (req, res, next) => {
+  delete req.session.refreshToken;
+  delete req.session.accessToken;
+  delete req.session.profile;
+  delete req.session.useGoogleId;
+  req.session.loggedIn = 'false';
+  res.send('logged out');
+});
 
 passport.serializeUser(function(user, cb) {
   process.nextTick(function() {

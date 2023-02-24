@@ -31,13 +31,16 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser('some-secret-encryption-key'));
 app.use(session({
-  store: new FileStore(),
+  store: new FileStore({
+    reapInterval: 60 // Remove expired sessions every 60 seconds
+  }),
   secret: 'some-secret-encryption-key',
   resave: false,
   saveUninitialized: true,
   cookie: {
     secure: false,
-    maxAge: 1000 * 60 * 60 * 24 * 30
+    httpOnly: false,
+    maxAge: 1000 * 60 * 5 // Session lasts for 5 minutes
   }
 }));
 
