@@ -1,10 +1,10 @@
-let createError = require('http-errors');
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
-let session = require('express-session');
-let FileStore = require('session-file-store')(session);
+let createError = require("http-errors");
+let express = require("express");
+let path = require("path");
+let cookieParser = require("cookie-parser");
+let logger = require("morgan");
+let session = require("express-session");
+let FileStore = require("session-file-store")(session);
 
 let indexRouter = require("./routes/index");
 let userRouter = require("./routes/landing");
@@ -15,9 +15,9 @@ let nodesRouter = require("./routes/node");
 let groupsRouter = require("./routes/group");
 let developersRouter = require("./routes/developers");
 
-let loginRouter = require('./routes/login');
-let testLoginRouter = require('./routes/test_login');
-let userDataRouter = require('./routes/userdata');
+let loginRouter = require("./routes/login");
+let testLoginRouter = require("./routes/test_login");
+let userDataRouter = require("./routes/userdata");
 
 let app = express();
 
@@ -29,13 +29,13 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cookieParser('some-secret-encryption-key'));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(cookieParser("some-secret-encryption-key"));
 app.use(session({
   store: new FileStore({
     reapInterval: 60 // Remove expired sessions every 60 seconds
   }),
-  secret: 'some-secret-encryption-key',
+  secret: "some-secret-encryption-key",
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -53,13 +53,13 @@ app.use("/map/node", nodesRouter);
 app.use("/map/group", groupsRouter);
 
 app.use("/landing", userRouter);
-app.get('/pg1ex', userRouter);
-app.get('/pg2ex', userRouter);
-app.get('/test_login', userRouter);
+app.get("/pg1ex", userRouter);
+app.get("/pg2ex", userRouter);
+app.get("/test_login", userRouter);
 
-app.use('/login', loginRouter);
-app.use('/test-login', testLoginRouter);
-app.use('/userdata', userDataRouter);
+app.use("/login", loginRouter);
+app.use("/test-login", testLoginRouter);
+app.use("/userdata", userDataRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
