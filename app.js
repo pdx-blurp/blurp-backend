@@ -6,13 +6,14 @@ let logger = require('morgan');
 let session = require('express-session');
 let FileStore = require('session-file-store')(session);
 
-let indexRouter = require('./routes/index');
-let userRouter = require("./routes/landing")
+let indexRouter = require("./routes/index");
+let userRouter = require("./routes/landing");
 
 let mapRouter = require("./routes/map");
-let relationshipsRouter = require('./routes/relationship')
-let nodesRouter = require('./routes/node')
-let developersRouter = require('./routes/developers')
+let relationshipsRouter = require("./routes/relationship");
+let nodesRouter = require("./routes/node");
+let groupsRouter = require("./routes/group");
+let developersRouter = require("./routes/developers");
 
 let loginRouter = require('./routes/login');
 let testLoginRouter = require('./routes/test_login');
@@ -44,11 +45,12 @@ app.use(session({
   }
 }));
 
-app.use('/', indexRouter);
-app.use('/developers', developersRouter)
-app.use('/map', mapRouter)
-app.use('/map/relationship', relationshipsRouter)
-app.use('/map/node', nodesRouter)
+app.use("/", indexRouter);
+app.use("/developers", developersRouter);
+app.use("/map", mapRouter);
+app.use("/map/relationship", relationshipsRouter);
+app.use("/map/node", nodesRouter);
+app.use("/map/group", groupsRouter);
 
 app.use("/landing", userRouter);
 app.get('/pg1ex', userRouter);
