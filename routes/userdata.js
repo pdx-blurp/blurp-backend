@@ -10,17 +10,17 @@ router.use((req, res, next) => {
 let cors = require('cors');
 
 
-router.get('/profilepic', cors({origin: 'http://localhost:5173'}), (req, res, next) => {
+// router.get('/profilepic', cors({origin: 'http://localhost:5173'}), (req, res, next) => {
 
-  let ret = null;
-  // Make a request to Google API
-  if(req.session.profile == null) {
-    ret = 'error';
-  }
-  else {
-    ret = req.session.profile.photos[0].value;
-  }
-  res.json(ret);
-});
+//   let ret = null;
+//   // Make a request to Google API
+//   if(req.session.profile == null) {
+//     ret = 'error';
+//   }
+//   else {
+//     ret = req.session.profile.photos[0].value;
+//   }
+//   res.json(ret);
+// });
 
 module.exports = router;

@@ -40,7 +40,7 @@ app.use(session({
   cookie: {
     secure: false,
     httpOnly: false,
-    maxAge: 1000 * 60 * 5 // Session lasts for 5 minutes
+    maxAge: 1 // Don't save sessions for non-logged in users (1 ms session)
   }
 }));
 
