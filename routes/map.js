@@ -67,7 +67,7 @@ router.post("/create", function (req, res, next) {
 			let relationships = [];
 			let groups = [];
 			collection
-				.insertOne({ userID: userID, mapID: crypto.randomUUID(), nodes: nodes, relationships: relationships, groups: groups })
+				.insertOne({ userID: userID, mapID: crypto.randomUUID(), title: title, nodes: nodes, relationships: relationships, groups: groups })
 				.then((result) => {
 					res.status(200).json(result);
 				})
