@@ -2,9 +2,6 @@ const express =  require('express');
 
 const router = express.Router();
 
-// login route
-router.post('/login', loginUser)
-
 // get a single user
 router.get('/:id', (req,res) => {
     res.json({mssg: "GET a single user"});
