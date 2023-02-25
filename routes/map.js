@@ -65,13 +65,15 @@ router.post("/create", function (req, res, next) {
 			let nodes = [];
 			let relationships = [];
 			let groups = [];
-			let mapID = crypto.randomUUID();
+			let map = crypto.randomUUID();
 			collection
-				.insertOne({ userID: userID, mapID: mapID, nodes: nodes, relationships: relationships, groups: groups })
+				.insertOne({ userID: userID, mapID: map, title: title, nodes: nodes, relationships: relationships, groups: groups })
 				.then((result) => {
-					res.status(200).json(mapID);
+					console.log(result);
+					res.status(200).json({ result: result, mapID: map });
 				})
 				.catch((err) => {
+					console.log(err);
 					res.status(400).json({ error: "Could not create new map" });
 				});
 		});
