@@ -37,7 +37,7 @@ router.post("/create", function (req, res, next) {
 			// TODO: check that two nodes actually exist
 
 			let relationshipData = {
-				relationshipID: crypto.randomUUID(),
+				relationshipID: relationshipinfo.relationshipID,
 				nodePair: {
 					nodeOne: relationshipinfo.nodePair.nodeOne,
 					nodeTwo: relationshipinfo.nodePair.nodeTwo,

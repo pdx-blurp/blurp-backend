@@ -33,7 +33,7 @@ router.get("/", (req, res, next) => {
 			// Find user by userID
 			collection
 				.find({ userID: userID })
-				.project({ mapID: 1, _id: 0 })
+				.project({ _id: 0 })
 				.toArray()
 				.then((ans) => {
 					if (ans.length === 0) res.status(400).json({ error: "Could not find user" });
@@ -66,12 +66,15 @@ router.post("/create", function (req, res, next) {
 			let nodes = [];
 			let relationships = [];
 			let groups = [];
+			let map = crypto.randomUUID();
 			collection
-				.insertOne({ userID: userID, mapID: crypto.randomUUID(), title: title, nodes: nodes, relationships: relationships, groups: groups })
+				.insertOne({ userID: userID, mapID: map, title: title, nodes: nodes, relationships: relationships, groups: groups })
 				.then((result) => {
-					res.status(200).json(result);
+					console.log(result);
+					res.status(200).json({ result: result, mapID: map });
 				})
 				.catch((err) => {
+					console.log(err);
 					res.status(400).json({ error: "Could not create new map" });
 				});
 		});
@@ -82,12 +85,12 @@ router.post("/create", function (req, res, next) {
  * Get endpoint, expects mapID and returns all data in a map document, can be the raw JSON object.
  */
 
-router.get("/get", function (req, res, next) {
+router.post("/get", function (req, res, next) {
 	// Expects mapID
 	const { mapID } = req.body;
 
 	// Ensure mapID is specified
-	if (!mapID && mapID !== 0) {
+	if (!mapID && mapID == 0) {
 		res.status(400).send("Must specify mapID!");
 	} else {
 		// Connect to the database

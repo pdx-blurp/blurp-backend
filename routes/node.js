@@ -83,6 +83,9 @@ router.get("/get", (req, res) => {
  */
 router.post("/create", (req, res) => {
 	const { userID, mapID, nodeinfo } = req.body;
+	console.log(userID);
+	console.log(mapID);
+	console.log(nodeinfo);
 
 	if (!userID || !mapID || !nodeinfo) {
 		res.status(400).send("userID, mapID, nodeinfo must be specified!");
@@ -93,13 +96,12 @@ router.post("/create", (req, res) => {
 		if (err) {
 			throw err;
 		}
-
 		const db = client.db("blurp");
 		const collection = db.collection("maps");
 
 		const newEntry = {
 			nodeName: nodeinfo.nodeName,
-			nodeID: crypto.randomUUID(),
+			nodeID: nodeinfo.nodeID,
 			color: nodeinfo.color,
 			description: nodeinfo.description,
 			pos: {
