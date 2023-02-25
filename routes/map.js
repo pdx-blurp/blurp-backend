@@ -50,7 +50,7 @@ router.post("/", (req, res, next) => {
 
 router.post("/create", function (req, res, next) {
 	// Grab the parameters from the request body that we need, userId
-	const { userID } = req.body;
+	const { userID, title } = req.body;
 
 	// Ensure userID is specified
 	if (!userID && userID !== 0) {
