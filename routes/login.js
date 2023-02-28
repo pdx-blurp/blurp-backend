@@ -89,6 +89,7 @@ router.get("/google/logout", cors({ origin: "http://localhost:5173" }), (req, re
 	res.clearCookie("loggedIntoGoogle");
 	res.clearCookie("profilePicUrl");
 	res.clearCookie("userName");
+	res.clearCookie("connect.sid");
 	req.session.cookie.maxAge = 1; // Have session expire immediately
 
 	// Front-end logs out user if 'success' is returned
