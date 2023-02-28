@@ -31,19 +31,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser("some-secret-encryption-key"));
-app.use(session({
-  store: new FileStore({
-    reapInterval: 60 // Remove expired sessions every 60 seconds
-  }),
-  secret: "some-secret-encryption-key",
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    secure: false,
-    httpOnly: false,
-    maxAge: 1 // Don't save sessions for non-logged in users (1 ms session)
-  }
-}));
+app.use(
+	session({
+		store: new FileStore({
+			reapInterval: 60, // Remove expired sessions every 60 seconds
+		}),
+		secret: "some-secret-encryption-key",
+		resave: false,
+		saveUninitialized: true,
+		cookie: {
+			secure: true,
+			httpOnly: true,
+			maxAge: 1, // Don't save sessions for non-logged in users (1 ms session)
+		},
+	})
+);
 
 app.use("/", indexRouter);
 app.use("/developers", developersRouter);
