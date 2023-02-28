@@ -24,16 +24,14 @@ passport.use(
 			clientSecret: "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",
 			callbackURL: "/login/google/redirect",
 		},
-		function (accessToken, refreshToken, profile, cb) {
+		async function (accessToken, refreshToken, profile, cb) {
 			profileTemp = profile;
 
 			client.connect().then((response) => {
-				console.log("\n-\n-\n-\nUSER IS nothing");
 				const database = response.db("newMongoDB");
 				const collection = database.collection("users");
 
 				collection.findOne({ authID: profileTemp.id }).then((user) => {
-					console.log("\n-\n-\n-\nUSER IS,", user);
 					if (user) {
 						console.log("user is:", user);
 						// cb(null, profileTemp);
@@ -41,16 +39,15 @@ passport.use(
 						// create new user
 						user = collection
 							.insertOne({ authID: profileTemp.id })
-							.save()
 							.then((user) => {
 								console.log("new user created:" + user);
 								// cb(null, profileTemp);
 							});
 					}
 				});
+				return cb(null, profileTemp);
 			});
 
-			return cb(null, profileTemp);
 		}
 	)
 );
@@ -71,7 +68,6 @@ router.get("/google/redirect", passport.authenticate("google", { failureRedirect
 
 	// STORE USER DATA IN DATABASE
 	// If the user's GoogleId doesn't already exists in the database, add them.
-	console.log("-\n-\n-\n-\n-\n", req.session.passport.user.id);
 
 	res.redirect(req.cookies.redirectAfterLogin);
 });
