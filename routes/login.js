@@ -3,6 +3,7 @@ var passport = require("passport");
 let cors = require("cors");
 let router = express.Router();
 const { client } = require("./dbhandler");
+const crypto = require("crypto");
 
 // Login session lasts for 1 month
 let SESSION_MAX_AGE = 30 * 24 * 3600000;
@@ -38,7 +39,7 @@ passport.use(
 					} else {
 						// create new user
 						user = collection
-							.insertOne({ authID: profileTemp.id })
+							.insertOne({ googleID: profileTemp.id, userID: crypto.randomUUID() })
 							.then((user) => {
 								console.log("new user created:" + user);
 								// cb(null, profileTemp);
