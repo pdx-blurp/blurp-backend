@@ -32,7 +32,7 @@ passport.use(
 				const database = response.db("newMongoDB");
 				const collection = database.collection("users");
 
-				collection.findOne({ authID: profileTemp.id }).then((user) => {
+				collection.findOne({ googleID: profileTemp.id }).then((user) => {
 					if (user) {
 						console.log("user is:", user);
 						// cb(null, profileTemp);
