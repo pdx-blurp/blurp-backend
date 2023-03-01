@@ -99,6 +99,7 @@ router.post("/create", (req, res) => {
 		const newEntry = {
 			nodeName: nodeinfo.nodeName,
 			nodeID: nodeinfo.nodeID,
+			color: nodeinfo.color,
 			description: nodeinfo.description,
 			pos: {
 				x: nodeinfo.pos.x,
