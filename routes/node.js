@@ -8,7 +8,7 @@ Using this to prevent the CORS blocked message that was popping up on front-end
 https://stackoverflow.com/questions/58403651/react-component-has-been-blocked-by-cors-policy-no-access-control-allow-origin
 */
 const cors = require("cors");
-router.use(cors());
+router.use(cors('*'));
 
 const { MongoClient } = require("mongodb");
 
