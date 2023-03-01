@@ -17,6 +17,7 @@ router.use((req, res, next) => {
 
 var GoogleStrategy = require("passport-google-oauth20").Strategy;
 let profileTemp = null;
+let userID = null;
 
 passport.use(
 	new GoogleStrategy(
@@ -35,18 +36,19 @@ passport.use(
 				collection.findOne({ googleID: profileTemp.id }).then((user) => {
 					if (user) {
 						console.log("user is:", user);
-						// cb(null, profileTemp);
+						userID = user.userID;
 					} else {
 						// create new user
-						user = collection
-							.insertOne({ googleID: profileTemp.id, userID: crypto.randomUUID() })
+						userID = crypto.randomUUID();
+						collection
+							.insertOne({ googleID: profileTemp.id, userID: userID })
 							.then((user) => {
 								console.log("new user created:" + user);
-								// cb(null, profileTemp);
+								console.log('\n\n\n\n\nNEW USER ID:', userUUID);
 							});
 					}
+					return cb(null, profileTemp);
 				});
-				return cb(null, profileTemp);
 			});
 
 		}
@@ -59,6 +61,7 @@ router.get("/google/redirect", passport.authenticate("google", { failureRedirect
 	req.session.userEmail = profileTemp.emails[0].value;
 	req.session.userName = profileTemp.name.givenName;
 	req.session.loggedIntoGoogle = "true";
+	req.session.userID = userID;
 
 	// Set loggedIntoGoogle cookie and profilePicUrl cookie for the browser.
 	// These cookies will expire when the session expires
