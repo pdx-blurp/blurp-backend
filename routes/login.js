@@ -5,6 +5,8 @@ let router = express.Router();
 const { client } = require("./dbhandler");
 const crypto = require("crypto");
 
+router.use(cors("http://localhost:5173"));
+
 // Login session lasts for 1 month
 let SESSION_MAX_AGE = 30 * 24 * 3600000;
 
@@ -30,7 +32,7 @@ passport.use(
 			profileTemp = profile;
 
 			client.connect().then((response) => {
-				const database = response.db("newMongoDB");
+				const database = response.db("blurp");
 				const collection = database.collection("users");
 
 				collection.findOne({ googleID: profileTemp.id }).then((user) => {
@@ -76,7 +78,7 @@ router.get("/google/redirect", passport.authenticate("google", { failureRedirect
 	res.redirect(req.cookies.redirectAfterLogin);
 });
 
-router.get("/isloggedintogoogle", cors({ origin: "http://localhost:5173" }), (req, res, next) => {
+router.get("/isloggedintogoogle", (req, res, next) => {
 	let ret = "false";
 	if (req.session.loggedIntoGoogle) {
 		ret = "true";
@@ -84,7 +86,7 @@ router.get("/isloggedintogoogle", cors({ origin: "http://localhost:5173" }), (re
 	res.json(ret);
 });
 
-router.get("/google/logout", cors({ origin: "http://localhost:5173" }), (req, res, next) => {
+router.get("/google/logout", (req, res, next) => {
 	// Delete loggedIntoGoogle cookies
 	res.clearCookie("loggedIntoGoogle");
 	res.clearCookie("profilePicUrl");
