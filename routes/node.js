@@ -13,7 +13,8 @@ router.use(cors());
 const { MongoClient } = require("mongodb");
 
 // Connection URL
-const url = fs.readFileSync(__dirname + "/../mongo.db", "utf-8");
+//const url = fs.readFileSync(__dirname + "/../mongo.db", "utf-8");
+const url = process.env.MONGO_URI;
 const client = new MongoClient(url);
 
 /**
