@@ -21,7 +21,7 @@ router.get("/", (req, res, next) => {
 	const { userID } = req.body;
 
 	// Ensure userID is specified
-	if (!userID && userID !== 0) {
+	if (!userID) {
 		res.status(400).send("Must specify userID!");
 	} else {
 		// Connect to the database
@@ -53,7 +53,7 @@ router.post("/create", function (req, res, next) {
 	const { userID } = req.body;
 
 	// Ensure userID is specified
-	if (!userID && userID !== 0) {
+	if (!userID) {
 		res.status(400).send("Must specify userID!");
 	} else {
 		// Connect to the database
@@ -86,7 +86,7 @@ router.post("/get", function (req, res, next) {
 	const { mapID } = req.body;
 
 	// Ensure mapID is specified
-	if (!mapID && mapID == 0) {
+	if (!mapID) {
 		res.status(400).send("Must specify mapID!");
 	} else {
 		// Connect to the database
@@ -118,7 +118,7 @@ router.patch("/update", function (req, res, next) {
 	const { userID, mapID, changes } = req.body;
 
 	// Ensure userID, newUserID and mapID is specified
-	if (!userID && userID !== 0) {
+	if (!userID) {
 		res.status(400).send("Must specify userID!");
 	} else if (!changes && changes !== 0) {
 		res.status(400).send("Must specify changes!");
@@ -172,7 +172,7 @@ router.delete("/delete", function (req, res, next) {
 	const { mapID, userID } = req.body;
 
 	// Ensure mapID and userID is specified
-	if (!mapID && mapID !== 0) {
+	if (!mapID) {
 		res.status(400).send("Must specify mapID!");
 	} else if (!userID && userID !== 0) {
 		res.status(400).send("Must specify userID!");

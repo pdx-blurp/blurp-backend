@@ -5,13 +5,13 @@ let router = express.Router();
 const { client } = require("./dbhandler");
 const crypto = require("crypto");
 
-router.use(cors("http://localhost:5173"));
+router.use(cors("https://blurp-pdx.netlify.app/"));
 
 // Login session lasts for 1 month
 let SESSION_MAX_AGE = 30 * 24 * 3600000;
 
 router.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+	res.header("Access-Control-Allow-Origin", "https://blurp-pdx.netlify.app/");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.header("Access-Control-Allow-Credentials", true);
 	next();
