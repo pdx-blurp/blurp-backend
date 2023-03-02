@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>HTML 5 Boilerplate</title>
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <script>
+    let aname = "";
+
+    function testloginfunction() {
+      console.log('started');
+      fetch('http://localhost:3000/test-login').then((res) => {
+          console.log(res.json());
+      });
+      console.log('here');
+    }
+
+    function setname() {
+      aname = document.getElementById("field").value;
+      fetch('http://localhost:3000/test-login/setname', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'aname': aname})
+      });
+    }
+  </script>
+  <button onclick="testloginfunction()">
+    click here to test login
+  </button>
+  <input id="field">
+  <button onclick="setname()">
+    click here to set your name
+  </button>
+</body>
+</html>
