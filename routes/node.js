@@ -8,12 +8,13 @@ Using this to prevent the CORS blocked message that was popping up on front-end
 https://stackoverflow.com/questions/58403651/react-component-has-been-blocked-by-cors-policy-no-access-control-allow-origin
 */
 const cors = require("cors");
-router.use(cors());
+router.use(cors('*'));
 
 const { MongoClient } = require("mongodb");
 
 // Connection URL
-const url = fs.readFileSync(__dirname + "/../mongo.db", "utf-8");
+//const url = fs.readFileSync(__dirname + "/../mongo.db", "utf-8");
+const url = process.env.MONGO_URI;
 const client = new MongoClient(url);
 
 /**
@@ -99,6 +100,7 @@ router.post("/create", (req, res) => {
 		const newEntry = {
 			nodeName: nodeinfo.nodeName,
 			nodeID: nodeinfo.nodeID,
+			color: nodeinfo.color,
 			description: nodeinfo.description,
 			pos: {
 				x: nodeinfo.pos.x,

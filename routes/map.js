@@ -9,14 +9,14 @@ Using this to prevent the CORS blocked message that was popping up on front-end
 https://stackoverflow.com/questions/58403651/react-component-has-been-blocked-by-cors-policy-no-access-control-allow-origin
 */
 const cors = require("cors");
-router.use(cors());
+router.use(cors('*'));
 
 /**
  * Root map endpoint, expects a userID value and returns a list of objects that contain userName
  * and mapID that the userID owns.
  */
 
-router.get("/", (req, res, next) => {
+router.post("/", (req, res, next) => {
 	// Expects userID
 	const { userID } = req.body;
 
@@ -50,7 +50,7 @@ router.get("/", (req, res, next) => {
 
 router.post("/create", function (req, res, next) {
 	// Grab the parameters from the request body that we need, userId
-	const { userID } = req.body;
+	const { userID, title } = req.body;
 
 	// Ensure userID is specified
 	if (!userID) {
@@ -65,12 +65,15 @@ router.post("/create", function (req, res, next) {
 			let nodes = [];
 			let relationships = [];
 			let groups = [];
+			let map = crypto.randomUUID();
 			collection
-				.insertOne({ userID: userID, mapID: crypto.randomUUID(), nodes: nodes, relationships: relationships, groups: groups })
+				.insertOne({ userID: userID, mapID: map, title: title, nodes: nodes, relationships: relationships, groups: groups })
 				.then((result) => {
-					res.status(200).json(result);
+					console.log(result);
+					res.status(200).json({ result: result, mapID: map });
 				})
 				.catch((err) => {
+					console.log(err);
 					res.status(400).json({ error: "Could not create new map" });
 				});
 		});
@@ -174,7 +177,7 @@ router.delete("/delete", function (req, res, next) {
 	// Ensure mapID and userID is specified
 	if (!mapID) {
 		res.status(400).send("Must specify mapID!");
-	} else if (!userID && userID !== 0) {
+	} else if (!userID) {
 		res.status(400).send("Must specify userID!");
 	} else {
 		// Connect to the database
