@@ -75,7 +75,7 @@ router.get("/google/redirect", passport.authenticate("google", { failureRedirect
 	// STORE USER DATA IN DATABASE
 	// If the user's GoogleId doesn't already exists in the database, add them.
 
-	res.redirect(req.cookies.redirectAfterLogin);
+	res.redirect("https://blurp-pdx.netlify.app");
 });
 
 router.get("/isloggedintogoogle", (req, res, next) => {
