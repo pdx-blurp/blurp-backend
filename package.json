@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "devStart": "nodemon -e js,ejs app.js",
-    "start": "nodemon ./bin/www"
+    "start": "./bin/www"
   },
   "repository": {
     "type": "git",
