@@ -12,8 +12,10 @@ let SESSION_MAX_AGE = 30 * 24 * 3600000;
 
 router.use((req, res, next) => {
 	res.header("Access-Control-Allow-Origin", "https://blurp-pdx.netlify.app/");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	//res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.header("Access-Control-Allow-Credentials", true);
+	res.header("Access-Control-Allow-Headers: Content-Type, *");
+	res.header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 	next();
 });
 
