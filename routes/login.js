@@ -59,7 +59,7 @@ passport.use(
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], prompt: "consent" }));
 
-router.get("/google/redirect", passport.authenticate("google", { successRedirect: "/", failureRedirect: "/" }), function (req, res) {
+router.get("/google/redirect", passport.authenticate("google", { successRedirect: "https://blurp-pdx.netlify.app", failureRedirect: "/" }), function (req, res) {
 	req.session.userEmail = profileTemp.emails[0].value;
 	req.session.userName = profileTemp.name.givenName;
 	req.session.loggedIntoGoogle = "true";
