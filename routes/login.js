@@ -61,7 +61,7 @@ passport.use(
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], prompt: "consent" }));
 
-router.get("/google/redirect", passport.authenticate("google", { successRedirect: "https://blurp-pdx.netlify.app", failureRedirect: "/" }), function (req, res) {
+router.get("/google/redirect", passport.authenticate("google", { failureRedirect: "/" }), function (req, res) {
 	req.session.userEmail = profileTemp.emails[0].value;
 	req.session.userName = profileTemp.name.givenName;
 	req.session.loggedIntoGoogle = "true";
@@ -77,7 +77,7 @@ router.get("/google/redirect", passport.authenticate("google", { successRedirect
 	// STORE USER DATA IN DATABASE
 	// If the user's GoogleId doesn't already exists in the database, add them.
 
-	// res.redirect("https://blurp-pdx.netlify.app");
+	res.redirect("https://blurp-pdx.netlify.app")
 });
 
 router.get("/isloggedintogoogle", (req, res, next) => {
