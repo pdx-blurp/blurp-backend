@@ -5,13 +5,11 @@ let router = express.Router();
 const { client } = require("./dbhandler");
 const crypto = require("crypto");
 
-router.use(cors("https://blurp-pdx.netlify.app/"));
-
 // Login session lasts for 1 month
 let SESSION_MAX_AGE = 30 * 24 * 3600000;
 
 router.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", "https://blurp-pdx.netlify.app/");
+	res.header("Access-Control-Allow-Origin", process.env.FRONTEND_DEV);
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.header("Access-Control-Allow-Credentials", true);
 	next();
@@ -42,17 +40,14 @@ passport.use(
 					} else {
 						// create new user
 						userID = crypto.randomUUID();
-						collection
-							.insertOne({ googleID: profileTemp.id, userID: userID })
-							.then((user) => {
-								console.log("new user created:" + user);
-								console.log('\n\n\n\n\nNEW USER ID:', userUUID);
-							});
+						collection.insertOne({ googleID: profileTemp.id, userID: userID }).then((user) => {
+							console.log("new user created:" + user);
+							console.log("\n\n\n\n\nNEW USER ID:", userUUID);
+						});
 					}
 					return cb(null, profileTemp);
 				});
 			});
-
 		}
 	)
 );
@@ -70,12 +65,13 @@ router.get("/google/redirect", passport.authenticate("google", { failureRedirect
 	res.cookie("loggedIntoGoogle", "true", { maxAge: SESSION_MAX_AGE, httpOnly: false });
 	res.cookie("profilePicUrl", profileTemp.photos[0].value, { maxAge: SESSION_MAX_AGE, httpOnly: false });
 	res.cookie("userName", profileTemp.name.givenName, { maxAge: SESSION_MAX_AGE, httpOnly: false });
+	res.cookie("userID", req.session.userID);
 	req.session.cookie.maxAge = SESSION_MAX_AGE;
 
 	// STORE USER DATA IN DATABASE
 	// If the user's GoogleId doesn't already exists in the database, add them.
 
-	res.redirect("https://blurp-pdx.netlify.app");
+	res.redirect(process.env.FRONTEND_DEV);
 });
 
 router.get("/isloggedintogoogle", (req, res, next) => {
