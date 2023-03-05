@@ -17,99 +17,104 @@ router.use((req, res, next) => {
 	next();
 });
 
-var GoogleStrategy = require("passport-google-oauth20").Strategy;
-let profileTemp = null;
-let userID = null;
+// var GoogleStrategy = require("passport-google-oauth20").Strategy;
+// let profileTemp = null;
+// let userID = null;
 
-passport.use(
-	new GoogleStrategy(
-		{
-			clientID: "220935592619-e7j93usk2h7vhcuoauos59rhgvqlcmsa.apps.googleusercontent.com",
-			clientSecret: "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",
-			callbackURL: "/login/google/redirect",
-		},
-		async function (accessToken, refreshToken, profile, cb) {
-			profileTemp = profile;
+// passport.use(
+// 	new GoogleStrategy(
+// 		{
+// 			clientID: "220935592619-e7j93usk2h7vhcuoauos59rhgvqlcmsa.apps.googleusercontent.com",
+// 			clientSecret: "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",
+// 			callbackURL: "/login/google/redirect",
+// 		},
+// 		async function (accessToken, refreshToken, profile, cb) {
+// 			profileTemp = profile;
 
-			client.connect().then((response) => {
-				const database = response.db("blurp");
-				const collection = database.collection("users");
+// 			client.connect().then((response) => {
+// 				const database = response.db("blurp");
+// 				const collection = database.collection("users");
 
-				collection.findOne({ googleID: profileTemp.id }).then((user) => {
-					if (user) {
-						console.log("user is:", user);
-						userID = user.userID;
-					} else {
-						// create new user
-						userID = crypto.randomUUID();
-						collection
-							.insertOne({ googleID: profileTemp.id, userID: userID })
-							.then((user) => {
-								console.log("new user created:" + user);
-								console.log('\n\n\n\n\nNEW USER ID:', userUUID);
-							});
-					}
-					return cb(null, profileTemp);
-				});
-			});
+// 				collection.findOne({ googleID: profileTemp.id }).then((user) => {
+// 					if (user) {
+// 						console.log("user is:", user);
+// 						userID = user.userID;
+// 					} else {
+// 						// create new user
+// 						userID = crypto.randomUUID();
+// 						collection
+// 							.insertOne({ googleID: profileTemp.id, userID: userID })
+// 							.then((user) => {
+// 								console.log("new user created:" + user);
+// 								console.log('\n\n\n\n\nNEW USER ID:', userUUID);
+// 							});
+// 					}
+// 					return cb(null, profileTemp);
+// 				});
+// 			});
 
-		}
-	)
-);
+// 		}
+// 	)
+// );
 
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], prompt: "consent" }));
+// router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], prompt: "consent" }));
 
-router.get("/google/redirect", passport.authenticate("google", { failureRedirect: "/" }), function (req, res) {
-	req.session.userEmail = profileTemp.emails[0].value;
-	req.session.userName = profileTemp.name.givenName;
-	req.session.loggedIntoGoogle = "true";
-	req.session.userID = userID;
+// router.get("/google/redirect", passport.authenticate("google", { failureRedirect: "/" }), function (req, res) {
+// 	req.session.userEmail = profileTemp.emails[0].value;
+// 	req.session.userName = profileTemp.name.givenName;
+// 	req.session.loggedIntoGoogle = "true";
+// 	req.session.userID = userID;
 
-	// Set loggedIntoGoogle cookie and profilePicUrl cookie for the browser.
-	// These cookies will expire when the session expires
-	res.cookie("loggedIntoGoogle", "true", { maxAge: SESSION_MAX_AGE, httpOnly: false });
-	res.cookie("profilePicUrl", profileTemp.photos[0].value, { maxAge: SESSION_MAX_AGE, httpOnly: false });
-	res.cookie("userName", profileTemp.name.givenName, { maxAge: SESSION_MAX_AGE, httpOnly: false });
-	req.session.cookie.maxAge = SESSION_MAX_AGE;
+// 	// Set loggedIntoGoogle cookie and profilePicUrl cookie for the browser.
+// 	// These cookies will expire when the session expires
+// 	res.cookie("loggedIntoGoogle", "true", { maxAge: SESSION_MAX_AGE, httpOnly: false });
+// 	res.cookie("profilePicUrl", profileTemp.photos[0].value, { maxAge: SESSION_MAX_AGE, httpOnly: false });
+// 	res.cookie("userName", profileTemp.name.givenName, { maxAge: SESSION_MAX_AGE, httpOnly: false });
+// 	req.session.cookie.maxAge = SESSION_MAX_AGE;
 
-	// STORE USER DATA IN DATABASE
-	// If the user's GoogleId doesn't already exists in the database, add them.
+// 	// STORE USER DATA IN DATABASE
+// 	// If the user's GoogleId doesn't already exists in the database, add them.
 
-	res.redirect("https://blurp-pdx.netlify.app");
-});
+// 	res.redirect("https://blurp-pdx.netlify.app");
+// });
 
-router.get("/isloggedintogoogle", (req, res, next) => {
-	let ret = "false";
-	if (req.session.loggedIntoGoogle) {
-		ret = "true";
-	}
-	res.json(ret);
-});
+// router.get("/isloggedintogoogle", (req, res, next) => {
+// 	let ret = "false";
+// 	if (req.session.loggedIntoGoogle) {
+// 		ret = "true";
+// 	}
+// 	res.json(ret);
+// });
 
-router.get("/google/logout", (req, res, next) => {
-	// Delete loggedIntoGoogle cookies
-	res.clearCookie("loggedIntoGoogle");
-	res.clearCookie("profilePicUrl");
-	res.clearCookie("userName");
-	res.clearCookie("connect.sid");
-	req.session.cookie.maxAge = 1; // Have session expire immediately
+// router.get("/google/logout", (req, res, next) => {
+// 	// Delete loggedIntoGoogle cookies
+// 	res.clearCookie("loggedIntoGoogle");
+// 	res.clearCookie("profilePicUrl");
+// 	res.clearCookie("userName");
+// 	res.clearCookie("connect.sid");
+// 	req.session.cookie.maxAge = 1; // Have session expire immediately
 
-	// Front-end logs out user if 'success' is returned
-	res.json("success");
-});
+// 	// Front-end logs out user if 'success' is returned
+// 	res.json("success");
+// });
 
-passport.serializeUser(function (user, cb) {
-	process.nextTick(function () {
-		return cb(null, {
-			id: user.id,
-		});
-	});
-});
+// passport.serializeUser(function (user, cb) {
+// 	process.nextTick(function () {
+// 		return cb(null, {
+// 			id: user.id,
+// 		});
+// 	});
+// });
 
-passport.deserializeUser(function (user, cb) {
-	process.nextTick(function () {
-		return cb(null, user);
-	});
+// passport.deserializeUser(function (user, cb) {
+// 	process.nextTick(function () {
+// 		return cb(null, user);
+// 	});
+// });
+
+router.post("/google", (res, req, next) => {
+	console.log('Body is:', req.body);
+	res.sendStatus(200);
 });
 
 module.exports = router;
