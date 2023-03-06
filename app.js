@@ -5,6 +5,8 @@ let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 let session = require("express-session");
 
+let FRONTEND_URL = "https://blurp-pdx.netlify.app";
+
 let indexRouter = require("./routes/index");
 let userRouter = require("./routes/landing");
 
@@ -49,6 +51,7 @@ app.use(
 		resave: false,
 		saveUninitialized: true,
 		cookie: {
+			domain: FRONTEND_URL,
 			secure: true,
 			httpOnly: true,
 			maxAge: 30000, // Don't save sessions for non-logged in users (30 sec session)
