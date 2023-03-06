@@ -4,7 +4,8 @@ let router = express.Router();
 const { client } = require("./dbhandler");
 const crypto = require("crypto");
 
-let FRONTEND_URL = 'http://localhost:5173';
+// let FRONTEND_URL = 'http://localhost:5173';
+let FRONTEND_URL = 'https://blurp-pdx.netlify.app/';
 
 router.use(cors({credentials: true, origin: FRONTEND_URL}));
 
