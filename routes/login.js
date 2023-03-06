@@ -55,7 +55,7 @@ router.use((req, res, next) => {
 	next();
 });
 
-router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
+router.get("/google", cors({credentials: true, origin: FRONTEND_URL}), (req, res, next) => {
 	console.log("Login request, session ", req.session.id);
 	let googleID = null;
 	let accessToken = req.query.accessToken;
@@ -104,7 +104,7 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 });
 
 
-router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
+router.get("/google/logout", cors({credentials: true, origin: FRONTEND_URL}), (req, res, next) => {
 	console.log("Logout request, session ", req.session.id);
 	req.session.destroy(err => {
 		if(err) return next(err);
