@@ -5,21 +5,21 @@ const { client } = require("./dbhandler");
 const crypto = require("crypto");
 const { URLSearchParams } = require("url");
 
-let frontend_url = 'http://localhost:5173';
+let FRONTEND_URL = 'http://localhost:5173';
 
-router.use(cors({credentials: true, origin: frontend_url}));
+router.use(cors({credentials: true, origin: FRONTEND_URL}));
 
 // Login session lasts for 1 month
 let SESSION_MAX_AGE = 30 * 24 * 3600;
 
 router.use((req, res, next) => {
-	res.header("Access-Control-Allow-Origin", frontend_url);
+	res.header("Access-Control-Allow-Origin", FRONTEND_URL);
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	res.header("Access-Control-Allow-Credentials", true);
 	next();
 });
 
-router.get("/google", cors({origin: frontend_url}), (req, res, next) => {
+router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 	let success = 'false';
 	let userName = null;
 	let googleID = null;
@@ -63,7 +63,7 @@ router.get("/google", cors({origin: frontend_url}), (req, res, next) => {
 });
 
 
-router.get("/google/logout", cors({origin: frontend_url}), (req, res, next) => {
+router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
 	console.log("\n\n\nDELETING SESSION:", req.session.id);
 	req.session.cookie.maxAge = 1;
 	res.json({'success': true});
