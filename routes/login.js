@@ -53,6 +53,7 @@ router.use((req, res, next) => {
 });
 
 router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
+	console.log("Login request, session ", req.session.id);
 	let googleID = null;
 	let accessToken = req.query.accessToken;
 	let url = `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`;
@@ -65,6 +66,7 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 	}).then(result => result.json()).then((result) => {
 		googleID = result.id;
 		req.session.cookie.maxAge = SESSION_MAX_AGE * 1000; // maxAge is in ms
+
 		if(googleID == undefined || googleID == null) {
 			res.json({
 				'success': false
@@ -100,8 +102,11 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 
 
 router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
-	req.session.cookie.maxAge = 1;
-	res.json({'success': true});
+	console.log("Logout request, session ", req.session.id);
+	req.session.destroy(err => {
+		if(err) return next(err);
+		res.status(200).send('success');
+	});
 });
 
 module.exports = router;
