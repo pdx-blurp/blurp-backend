@@ -34,7 +34,7 @@ app.use(cookieParser("some-secret-encryption-key"));
 app.use(
 	session({
 		store: new FileStore({
-			reapInterval: 5, // Remove expired sessions every 60 seconds
+			reapInterval: 30, // Remove expired sessions every 30 seconds
 		}),
 		secret: "some-secret-encryption-key",
 		resave: false,
