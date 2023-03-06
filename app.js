@@ -34,14 +34,14 @@ app.use(cookieParser("some-secret-encryption-key"));
 app.use(
 	session({
 		store: new FileStore({
-			reapInterval: 30, // Remove expired sessions every 60 seconds
+			reapInterval: 30, // Remove expired sessions every 30 seconds
 		}),
 		secret: "some-secret-encryption-key",
 		resave: false,
 		saveUninitialized: true,
 		cookie: {
 			secure: false,
-			httpOnly: true,
+			httpOnly: false,
 			maxAge: 1, // Don't save sessions for non-logged in users (1 ms session)
 		},
 	})
