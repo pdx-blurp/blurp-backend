@@ -1,4 +1,4 @@
 node_modules
 .idea/
-sessions
+sessions/*
 mongo.db
