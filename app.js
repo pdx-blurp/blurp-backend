@@ -27,6 +27,10 @@ let store = new mongoDBStore({
 	collection: 'sessions',
 	expiresAfterSeconds: 3000
 });
+// Catch mongo store errors
+store.on('error', function(error) {
+	console.log('Session store error:', error);
+})
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
