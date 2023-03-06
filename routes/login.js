@@ -56,6 +56,7 @@ router.use((req, res, next) => {
 });
 
 router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
+	console.log("Login requested from session ID ", req.session.id);
 	let googleID = null;
 	let accessToken = req.query.accessToken;
 	let url = `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`;
@@ -103,6 +104,7 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 
 
 router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
+	console.log("Logout requested from session ID ", req.session.id);
 	req.session.cookie.maxAge = 1;
 	res.json({'success': true});
 });
