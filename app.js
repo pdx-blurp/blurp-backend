@@ -27,10 +27,6 @@ let store = new mongoDBStore({
 	collection: 'sessions',
 	expiresAfterSeconds: 3000
 });
-// Catch mongo store errors
-store.on('error', function(error) {
-	console.log('Session store error:', error);
-})
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -49,8 +45,8 @@ app.use(
 		resave: false,
 		saveUninitialized: true,
 		cookie: {
-			secure: false,
-			httpOnly: false,
+			secure: true,
+			httpOnly: true,
 			maxAge: 1, // Don't save sessions for non-logged in users (1 ms session)
 		},
 	})
