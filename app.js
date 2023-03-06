@@ -4,7 +4,6 @@ let path = require("path");
 let cookieParser = require("cookie-parser");
 let logger = require("morgan");
 let session = require("express-session");
-let FileStore = require("session-file-store")(session);
 
 let indexRouter = require("./routes/index");
 let userRouter = require("./routes/landing");
@@ -21,6 +20,18 @@ let userDataRouter = require("./routes/userdata");
 
 let app = express();
 
+let mongoDBStore = require("connect-mongodb-session")(session);
+let store = new mongoDBStore({
+	uri: process.env.MONGO_URI,
+	databaseName: 'blurp',
+	collection: 'sessions',
+	expiresAfterSeconds: 3000
+});
+// Catch mongo store errors
+store.on('error', function(error) {
+	console.log('Session store error:', error);
+})
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -33,9 +44,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser("some-secret-encryption-key"));
 app.use(
 	session({
-		store: new FileStore({
-			reapInterval: 30, // Remove expired sessions every 30 seconds
-		}),
+		store: store,
 		secret: "some-secret-encryption-key",
 		resave: false,
 		saveUninitialized: true,
