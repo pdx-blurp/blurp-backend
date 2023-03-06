@@ -49,8 +49,8 @@ app.use(
 		resave: false,
 		saveUninitialized: true,
 		cookie: {
-			secure: false,
-			httpOnly: false,
+			secure: true,
+			httpOnly: true,
 			maxAge: 1, // Don't save sessions for non-logged in users (1 ms session)
 		},
 	})
