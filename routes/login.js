@@ -3,6 +3,7 @@ let cors = require("cors");
 let router = express.Router();
 const { client } = require("./dbhandler");
 const crypto = require("crypto");
+let { createSession, retrieveUserID, destroySession } = require("./../session_manager");
 
 let FRONTEND_URL = 'http://localhost:5173';
 
@@ -53,7 +54,6 @@ router.use((req, res, next) => {
 });
 
 router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
-	console.log("Login request, session ", req.session.id);
 	let googleID = null;
 	let accessToken = req.query.accessToken;
 	let url = `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`;
@@ -65,7 +65,7 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 		headers: headers
 	}).then(result => result.json()).then((result) => {
 		googleID = result.id;
-		req.session.cookie.maxAge = SESSION_MAX_AGE * 1000; // maxAge is in ms
+		// req.session.cookie.maxAge = SESSION_MAX_AGE * 1000; // maxAge is in ms
 
 		if(googleID == undefined || googleID == null) {
 			res.json({
@@ -82,12 +82,19 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 					});
 				}
 				else {
-					req.session.userID = userID;
-					res.json({
-						'success': true,
-						'userName': result.given_name,
-						'profileUrl': result.picture,
-						'maxAge': SESSION_MAX_AGE,
+					// req.session.userID = userID;
+					// Create a session
+					createSession(userID, SESSION_MAX_AGE * 1000).then((sessionID) => {
+						res.json({
+							'success': true,
+							'userName': result.given_name,
+							'profileUrl': result.picture,
+							'sessionID': sessionID,
+							'maxAge': SESSION_MAX_AGE,
+						});
+					})
+					.catch((err) => {
+						res.status(500).send(err);
 					});
 				}
 			});
@@ -102,11 +109,13 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 
 
 router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
-	console.log("Logout request, session ", req.session.id);
-	req.session.destroy(err => {
-		if(err) return next(err);
-		res.status(200).send('success');
-	});
+	let sessionID = req.query.sessionID;
+	destroySession(sessionID).then((result) => {
+		console.log("Session destroyed");
+		res.status(200).send("success");
+	}).catch((err) => {
+		res.status(400).send(err);
+	})
 });
 
 module.exports = router;
