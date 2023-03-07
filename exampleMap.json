@@ -1,0 +1,55 @@
+{
+    "_id": {
+      "$oid": "MongoDB generated OID"
+    },
+    "userID": "Backend generated UUID",
+    "mapID": "Backend generated mapID",
+    "title": "User input map title",
+    "nodes": [
+      {
+        "nodeName": "User input node name",
+        "nodeID": "Backend generated nodeID",
+        "color": "Hexadecimal color",
+        "description": "User input description",
+        "pos": {
+          "x": 0.6632882909555184,
+          "y": 1.4593468844136104
+        },
+        "type": "Frontend supplied tag",
+        "age": 0,
+        "groups": [],
+        "size": 12
+      },
+      {
+        "nodeName": "User input node name 2",
+        "nodeID": "Backend generated nodeID 2",
+        "color": "Hexadecimal color",
+        "description": "User input description 2",
+        "pos": {
+          "x": -0.5117117503755972,
+          "y": 0.6387387438665462
+        },
+        "type": "Frontend supplied tag 2",
+        "age": 0,
+        "groups": [],
+        "size": 27
+      }
+    ],
+    "relationships": [
+      {
+        "relationshipID": "Backend generated relationshipID",
+        "nodePair": {
+          "nodeOne": "Backend generated nodeID",
+          "nodeTwo": "Backend generated nodeID 2"
+        },
+        "description": "User input description",
+        "relationshipType": {
+          "type": "Frontend supplied tag",
+          "familiarity": 100,
+          "stressCode": "5",
+          "size": 6
+        }
+      }
+    ],
+    "groups": []
+  }
