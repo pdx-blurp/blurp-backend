@@ -65,8 +65,6 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 		headers: headers
 	}).then(result => result.json()).then((result) => {
 		googleID = result.id;
-		// req.session.cookie.maxAge = SESSION_MAX_AGE * 1000; // maxAge is in ms
-
 		if(googleID == undefined || googleID == null) {
 			res.json({
 				'success': false
@@ -82,7 +80,6 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 					});
 				}
 				else {
-					// req.session.userID = userID;
 					// Create a session
 					createSession(userID, SESSION_MAX_AGE * 1000).then((sessionID) => {
 						res.json({
@@ -110,11 +107,20 @@ router.get("/google", cors({origin: FRONTEND_URL}), (req, res, next) => {
 
 router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
 	let sessionID = req.query.sessionID;
+	if(!sessionID) {
+		// If no session provided, the user is already logged out
+		res.status(200).send("success");
+	}
 	destroySession(sessionID).then((result) => {
-		console.log("Session destroyed");
 		res.status(200).send("success");
 	}).catch((err) => {
-		res.status(400).send(err);
+		if(err == "Session not found.") {
+			// Already no session
+			res.status(200).send("success");
+		}
+		else {
+			res.status(400).send(err);
+		}
 	})
 });
 

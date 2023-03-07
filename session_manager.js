@@ -13,6 +13,7 @@ function createSession(userID, maxAge) {
             collection.insertOne({
                 sessionID: sessionID,
                 userID: userID,
+                expires: (new Date()).getTime() + maxAge,
                 data: {}
             }).then((res) => {
                 resolve(sessionID);
@@ -46,6 +47,18 @@ function destroySession(sessionID) {
     });
 }
 
+function deleteExpiredSessions() {
+    client.connect().then((res) => {
+        console.log("Deleting expired sessions.");
+        let currentDate = (new Date()).getTime();
+        const collection = res.db("blurp").collection("sessions");
+        collection.deleteMany({expires: {$lt: currentDate}});
+    }).catch((err) => {
+        console.log("Could not delete expired sessions from database.");
+        console.log(err);
+    });
+}
+
 // Provide a sessionID to get a userID
 // If userID doesn't exist, reject
 function retrieveUserID(sessionID) {
@@ -69,4 +82,4 @@ function retrieveUserID(sessionID) {
     });
 }
 
-module.exports = { createSession, retrieveUserID, destroySession }
+module.exports = { createSession, retrieveUserID, destroySession,deleteExpiredSessions }
