@@ -57,7 +57,6 @@ router.use((req, res, next) => {
 });
 
 router.get("/google", cors({credentials: true, origin: FRONTEND_URL}), (req, res, next) => {
-	console.log("Login request, session ", req.session.id);
 	let googleID = null;
 	let accessToken = req.query.accessToken;
 	let url = `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`;
@@ -86,6 +85,7 @@ router.get("/google", cors({credentials: true, origin: FRONTEND_URL}), (req, res
 				else {
 					// Create a session
 					createSession(userID, SESSION_MAX_AGE * 1000).then((sessionID) => {
+						console.log("[Login] New session created:", sessionID);
 						res.json({
 							'success': true,
 							'userName': result.given_name,
@@ -110,13 +110,13 @@ router.get("/google", cors({credentials: true, origin: FRONTEND_URL}), (req, res
 
 
 router.get("/google/logout", cors({origin: FRONTEND_URL}), (req, res, next) => {
-	console.log("Logout request, session ", req.session.id);
 	let sessionID = req.query.sessionID;
 	if(!sessionID) {
 		// If no session provided, the user is already logged out
 		res.status(200).send("success");
 	}
 	destroySession(sessionID).then((result) => {
+		console.log("[Logout] Session destroyed:", sessionID);
 		res.status(200).send("success");
 	}).catch((err) => {
 		if(err == "Session not found.") {
