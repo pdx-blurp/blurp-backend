@@ -8,9 +8,11 @@ Using this to prevent the CORS blocked message that was popping up on front-end
 https://stackoverflow.com/questions/58403651/react-component-has-been-blocked-by-cors-policy-no-access-control-allow-origin
 */
 const cors = require("cors");
-router.use(cors('*'));
+router.use(cors("*"));
 
 const { MongoClient } = require("mongodb");
+const { retrieveUserID } = require("../session_manager");
+const { session } = require("passport");
 
 // Connection URL
 //const url = fs.readFileSync(__dirname + "/../mongo.db", "utf-8");
@@ -83,49 +85,55 @@ router.get("/get", (req, res) => {
  * POST request which takes userID, mapID, name, and color, and creates a new node record.
  */
 router.post("/create", (req, res) => {
-	const { userID, mapID, nodeinfo } = req.body;
+	const { sessionID, mapID, nodeinfo } = req.body;
 
-	if (!userID || !mapID || !nodeinfo) {
-		res.status(400).send("userID, mapID, nodeinfo must be specified!");
-		return;
-	}
+	retrieveUserID(sessionID)
+		.then((userID) => {
+			if (!userID || !mapID || !nodeinfo) {
+				res.status(400).send("userID, mapID, nodeinfo must be specified!");
+				return;
+			}
 
-	client.connect((err) => {
-		if (err) {
-			throw err;
-		}
-		const db = client.db("blurp");
-		const collection = db.collection("maps");
-
-		const newEntry = {
-			nodeName: nodeinfo.nodeName,
-			nodeID: nodeinfo.nodeID,
-			color: nodeinfo.color,
-			description: nodeinfo.description,
-			pos: {
-				x: nodeinfo.pos.x,
-				y: nodeinfo.pos.y,
-			},
-			type: nodeinfo.type,
-			age: nodeinfo.age,
-			color: nodeinfo.color,
-			groups: [],
-			size: nodeinfo.size,
-		};
-		//collection.insertOne(newEntry)
-		collection
-			.updateOne({ mapID: mapID }, { $push: { nodes: newEntry } })
-			.then((output) => {
-				if (output.modifiedCount === 1 && output.matchedCount === 1) {
-					res.status(200).send({ message: "Node created" });
-				} else if (output.matchedCount === 0) {
-					res.status(400).send({ message: "Node not created" });
+			client.connect((err) => {
+				if (err) {
+					throw err;
 				}
-			})
-			.catch((error) => {
-				res.status(400).send("Invalid input.");
+				const db = client.db("blurp");
+				const collection = db.collection("maps");
+
+				const newEntry = {
+					nodeName: nodeinfo.nodeName,
+					nodeID: nodeinfo.nodeID,
+					color: nodeinfo.color,
+					description: nodeinfo.description,
+					pos: {
+						x: nodeinfo.pos.x,
+						y: nodeinfo.pos.y,
+					},
+					type: nodeinfo.type,
+					age: nodeinfo.age,
+					color: nodeinfo.color,
+					groups: [],
+					size: nodeinfo.size,
+				};
+				//collection.insertOne(newEntry)
+				collection
+					.updateOne({ mapID: mapID }, { $push: { nodes: newEntry } })
+					.then((output) => {
+						if (output.modifiedCount === 1 && output.matchedCount === 1) {
+							res.status(200).send({ message: "Node created" });
+						} else if (output.matchedCount === 0) {
+							res.status(400).send({ message: "Node not created" });
+						}
+					})
+					.catch((error) => {
+						res.status(400).send("Invalid input.");
+					});
 			});
-	});
+		})
+		.catch((error) => {
+			console.log(error);
+		});
 });
 
 /**

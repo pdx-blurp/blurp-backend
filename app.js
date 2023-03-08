@@ -6,8 +6,6 @@ let logger = require("morgan");
 // let session = require("express-session");
 let { deleteExpiredSessions, destroySession } = require("./session_manager");
 
-let FRONTEND_URL = "https://blurp-pdx.netlify.app";
-
 let indexRouter = require("./routes/index");
 let userRouter = require("./routes/landing");
 

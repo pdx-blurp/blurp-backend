@@ -3,13 +3,14 @@ const fs = require("fs");
 let router = express.Router();
 const crypto = require("crypto");
 const { client } = require("./dbhandler");
+let { createSession, retrieveUserID, destroySession } = require("./../session_manager");
 
 /* 
 Using this to prevent the CORS blocked message that was popping up on front-end
 https://stackoverflow.com/questions/58403651/react-component-has-been-blocked-by-cors-policy-no-access-control-allow-origin
 */
 const cors = require("cors");
-router.use(cors('*'));
+router.use(cors("*"));
 
 /**
  * Root map endpoint, expects a userID value and returns a list of objects that contain userName
@@ -18,29 +19,35 @@ router.use(cors('*'));
 
 router.post("/", (req, res, next) => {
 	// Expects userID
-	const { userID } = req.body;
+	const { sessionID } = req.body;
+	retrieveUserID(sessionID)
+		.then((userID) => {
+			if (!userID) {
+				res.status(400).send("Must specify userID!");
+			} else {
+				// Connect to the database
+				client.connect(() => {
+					// Navigate to the correct database and collection
+					let database = client.db("blurp");
+					let collection = database.collection("maps");
+
+					// Find user by userID
+					collection
+						.find({ userID: userID })
+						.project({ _id: 0 })
+						.toArray()
+						.then((ans) => {
+							if (ans.length === 0) res.status(400).json({ error: "Could not find user" });
+							else res.status(200).json(ans);
+						});
+				});
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+		});
 
 	// Ensure userID is specified
-	if (!userID) {
-		res.status(400).send("Must specify userID!");
-	} else {
-		// Connect to the database
-		client.connect(() => {
-			// Navigate to the correct database and collection
-			let database = client.db("blurp");
-			let collection = database.collection("maps");
-
-			// Find user by userID
-			collection
-				.find({ userID: userID })
-				.project({ _id: 0 })
-				.toArray()
-				.then((ans) => {
-					if (ans.length === 0) res.status(400).json({ error: "Could not find user" });
-					else res.status(200).json(ans);
-				});
-		});
-	}
 });
 
 /**
@@ -50,34 +57,40 @@ router.post("/", (req, res, next) => {
 
 router.post("/create", function (req, res, next) {
 	// Grab the parameters from the request body that we need, userId
-	const { userID, title } = req.body;
+	const { sessionID, title } = req.body;
 
-	// Ensure userID is specified
-	if (!userID) {
-		res.status(400).send("Must specify userID!");
-	} else {
-		// Connect to the database
-		client.connect(() => {
-			// Navigate to the correct database and collection
-			let database = client.db("blurp");
-			let collection = database.collection("maps");
-			// Add an empty map with userID, empty node array and empty relationships array
-			let nodes = [];
-			let relationships = [];
-			let groups = [];
-			let map = crypto.randomUUID();
-			collection
-				.insertOne({ userID: userID, mapID: map, title: title, nodes: nodes, relationships: relationships, groups: groups })
-				.then((result) => {
-					console.log(result);
-					res.status(200).json({ result: result, mapID: map });
-				})
-				.catch((err) => {
-					console.log(err);
-					res.status(400).json({ error: "Could not create new map" });
+	retrieveUserID(sessionID)
+		.then((userID) => {
+			// Ensure userID is specified
+			if (!userID) {
+				res.status(400).send("Must specify userID!");
+			} else {
+				// Connect to the database
+				client.connect(() => {
+					// Navigate to the correct database and collection
+					let database = client.db("blurp");
+					let collection = database.collection("maps");
+					// Add an empty map with userID, empty node array and empty relationships array
+					let nodes = [];
+					let relationships = [];
+					let groups = [];
+					let map = crypto.randomUUID();
+					collection
+						.insertOne({ userID: userID, mapID: map, title: title, nodes: nodes, relationships: relationships, groups: groups })
+						.then((result) => {
+							console.log(result);
+							res.status(200).json({ result: result, mapID: map });
+						})
+						.catch((err) => {
+							console.log(err);
+							res.status(400).json({ error: "Could not create new map" });
+						});
 				});
+			}
+		})
+		.catch((error) => {
+			console.log(error);
 		});
-	}
 });
 
 /**
@@ -118,51 +131,57 @@ router.post("/get", function (req, res, next) {
 
 router.patch("/update", function (req, res, next) {
 	// Expect userID, newUserID, and mapID
-	const { userID, mapID, changes } = req.body;
+	const { sessionID, mapID, changes } = req.body;
 
-	// Ensure userID, newUserID and mapID is specified
-	if (!userID) {
-		res.status(400).send("Must specify userID!");
-	} else if (!changes && changes !== 0) {
-		res.status(400).send("Must specify changes!");
-	} else if (!mapID) {
-		res.status(400).send("Must specify mapID!");
-	}
-	// Ensure newUserID is not node/relationships array
-	else {
-		// Connect to the database
-		client.connect(() => {
-			// Navigate to the correct database and collection
-			let database = client.db("blurp");
-			let collection = database.collection("maps");
+	retrieveUserID(sessionID)
+		.then((userID) => {
+			// Ensure userID, newUserID and mapID is specified
+			if (!userID) {
+				res.status(400).send("Must specify userID!");
+			} else if (!changes && changes !== 0) {
+				res.status(400).send("Must specify changes!");
+			} else if (!mapID) {
+				res.status(400).send("Must specify mapID!");
+			}
+			// Ensure newUserID is not node/relationships array
+			else {
+				// Connect to the database
+				client.connect(() => {
+					// Navigate to the correct database and collection
+					let database = client.db("blurp");
+					let collection = database.collection("maps");
 
-			// Find map by MapID
-			collection
-				.find({ mapID: mapID })
-				.toArray()
-				.then((ans) => {
-					if (ans.length === 0)
-						// Couldnt find map
-						res.status(400).json({ error: "Could not find map" });
-					else {
-						// Check if user owns the map by comparing userIDs
-						let found = ans.find((inMap) => inMap.userID === userID);
+					// Find map by MapID
+					collection
+						.find({ mapID: mapID })
+						.toArray()
+						.then((ans) => {
+							if (ans.length === 0)
+								// Couldnt find map
+								res.status(400).json({ error: "Could not find map" });
+							else {
+								// Check if user owns the map by comparing userIDs
+								let found = ans.find((inMap) => inMap.userID === userID);
 
-						if (found) {
-							// Update userID with newUserID for that map
-							collection
-								.updateOne({ mapID: mapID }, { $set: changes })
-								.then((result) => {
-									res.status(200).json(result);
-								})
-								.catch((err) => {
-									res.status(400).json({ error: "Could not fetch map" });
-								});
-						} else res.status(400).json({ error: "UserID does not own the map" });
-					}
+								if (found) {
+									// Update userID with newUserID for that map
+									collection
+										.updateOne({ mapID: mapID }, { $set: changes })
+										.then((result) => {
+											res.status(200).json(result);
+										})
+										.catch((err) => {
+											res.status(400).json({ error: "Could not fetch map" });
+										});
+								} else res.status(400).json({ error: "UserID does not own the map" });
+							}
+						});
 				});
+			}
+		})
+		.catch((error) => {
+			console.log(error);
 		});
-	}
 });
 
 /**
@@ -172,51 +191,57 @@ router.patch("/update", function (req, res, next) {
  */
 router.delete("/delete", function (req, res, next) {
 	// Expects mapID and userID
-	const { mapID, userID } = req.body;
+	const { mapID, sessionID } = req.body;
 
-	// Ensure mapID and userID is specified
-	if (!mapID) {
-		res.status(400).send("Must specify mapID!");
-	} else if (!userID) {
-		res.status(400).send("Must specify userID!");
-	} else {
-		// Connect to the database
-		client.connect(() => {
-			// Navigate to the correct database and collection
-			let database = client.db("blurp");
-			let collection = database.collection("maps");
+	retrieveUserID(sessionID)
+		.then((userID) => {
+			// Ensure mapID and userID is specified
+			if (!mapID) {
+				res.status(400).send("Must specify mapID!");
+			} else if (!userID) {
+				res.status(400).send("Must specify userID!");
+			} else {
+				// Connect to the database
+				client.connect(() => {
+					// Navigate to the correct database and collection
+					let database = client.db("blurp");
+					let collection = database.collection("maps");
 
-			// Find map by MapID
-			collection
-				.find({ mapID: mapID })
-				.toArray()
-				.then((ans) => {
-					if (ans.length === 0)
-						// Couldnt find map
-						res.status(400).json({ error: "Could not find map" });
-					else {
-						// Check if user owns the map by comparing userIDs
-						let found = ans.find((inMap) => inMap.userID === userID);
+					// Find map by MapID
+					collection
+						.find({ mapID: mapID })
+						.toArray()
+						.then((ans) => {
+							if (ans.length === 0)
+								// Couldnt find map
+								res.status(400).json({ error: "Could not find map" });
+							else {
+								// Check if user owns the map by comparing userIDs
+								let found = ans.find((inMap) => inMap.userID === userID);
 
-						if (found) {
-							// Delete map by mapID
-							collection
-								.deleteOne({ mapID: mapID })
-								.then((result) => {
-									if (result.deletedCount === 1) {
-										res.status(200).json({ message: "Map deleted" });
-									} else {
-										res.status(400).json({ error: result });
-									}
-								})
-								.catch((err) => {
-									res.status(400).json({ error: "Could not fetch map" });
-								});
-						} else res.status(400).json({ error: "UserID does not own the map" });
-					}
+								if (found) {
+									// Delete map by mapID
+									collection
+										.deleteOne({ mapID: mapID })
+										.then((result) => {
+											if (result.deletedCount === 1) {
+												res.status(200).json({ message: "Map deleted" });
+											} else {
+												res.status(400).json({ error: result });
+											}
+										})
+										.catch((err) => {
+											res.status(400).json({ error: "Could not fetch map" });
+										});
+								} else res.status(400).json({ error: "UserID does not own the map" });
+							}
+						});
 				});
+			}
+		})
+		.catch((error) => {
+			console.log(error);
 		});
-	}
 });
 
 module.exports = router;
