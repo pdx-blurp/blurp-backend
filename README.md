@@ -45,3 +45,11 @@ x/get
 * Truc N (ngotruc@pdx.edu)
 * Jaime M (jgm7@pdx.edu)
 * Thomas G (trg5@pdx.edu)
+
+## Starting the Backend App
+### Install packages
+	npm install
+### Set MongoDB connection
+	export MONGO_URI=<your_mongo_connection_url>
+### Start app
+	npm run start
